@@ -15,10 +15,9 @@ public class ClientService {
 
     private static String tokenUrl = "http://localhost:8080/oauth/token";
 
-    public Object getToken() {
-        HttpEntity<UserDto> request = new HttpEntity<>(new UserDto("admin", "admin", "password"));
-        Object token = restTemplate.postForObject(tokenUrl , request, TokenDto.class);
-        return token;
+    public TokenDto getToken() {
+        var request = new HttpEntity<>(new UserDto("admin", "admin", "password"));
+        return restTemplate.postForObject(tokenUrl, request, TokenDto.class);
     }
 
 }
