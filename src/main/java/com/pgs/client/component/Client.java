@@ -1,19 +1,22 @@
 package com.pgs.client.component;
 
-import com.pgs.client.service.ClientService;
+import com.pgs.client.service.AuthenticationClient;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class Client {
 
-    private final ClientService clientService;
+    private final AuthenticationClient clientService;
 
     @PostConstruct
-    private void postConstruct() {
-        clientService.getToken();
+    public void postConstruct() {
+        var token = clientService.getToken();
+        log.info("Token: {}", token);
     }
 }
