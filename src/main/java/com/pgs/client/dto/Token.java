@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class TokenDto {
+public class Token {
     private String accessToken;
     private String tokenType;
     private String refreshType;
