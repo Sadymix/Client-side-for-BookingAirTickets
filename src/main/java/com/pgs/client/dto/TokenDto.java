@@ -1,14 +1,17 @@
 package com.pgs.client.dto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class TokenDto {
-    private String access_token;
-    private String token_type;
-    private String refresh_type;
-    private Integer expires_in;
+    private String accessToken;
+    private String tokenType;
+    private String refreshType;
+    private Integer expiresIn;
     private String scope;
 }
