@@ -19,10 +19,10 @@ public class ClientService {
     @Value("${app.user.password}")
     private String password;
     @Value("${app.token.url}")
-    private String token;
+    private String tokenUrl;
+
     public TokenDto getToken() {
         var request = new HttpEntity<>(new UserDto(username, password, "password"));
-        return restTemplate.postForObject(token, request, TokenDto.class);
+        return restTemplate.postForObject(tokenUrl, request, TokenDto.class);
     }
-
 }
