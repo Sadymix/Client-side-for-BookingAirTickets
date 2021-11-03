@@ -22,7 +22,7 @@ class ClientServiceTest {
     @Mock
     private RestTemplate restTemplate;
 
-    private static final TokenDto TOKEN_DTO= TokenDto.builder()
+    private static final TokenDto TOKEN_DTO = TokenDto.builder()
             .access_token("asd")
             .token_type("dsa")
             .refresh_type("sda")
@@ -33,8 +33,8 @@ class ClientServiceTest {
     @Test
     void getToken() {
         var request = new HttpEntity<>(new UserDto("admin", "admin", "password"));
-        when(restTemplate.postForObject("http://localhost:8080/oauth/token",request,TokenDto.class)).thenReturn(TOKEN_DTO);
-        var token= clientService.getToken();
+        when(restTemplate.postForObject("http://localhost:8080/oauth/token", request, TokenDto.class)).thenReturn(TOKEN_DTO);
+        var token = clientService.getToken();
         assertEquals(TOKEN_DTO.getAccess_token(), token.getAccess_token());
         assertEquals(TOKEN_DTO.getToken_type(), token.getToken_type());
         assertEquals(TOKEN_DTO.getRefresh_type(), token.getRefresh_type());
