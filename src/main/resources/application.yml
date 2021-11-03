@@ -1,0 +1,8 @@
+server:
+  port: 8081
+app:
+  user:
+    name: admin
+    password: admin
+  token:
+    url: http://localhost:8080/oauth/token
