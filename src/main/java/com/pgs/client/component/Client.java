@@ -3,12 +3,14 @@ package com.pgs.client.component;
 import com.pgs.client.service.AuthenticationClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
 @Slf4j
 @Component
+@Profile("smoke-test")
 @RequiredArgsConstructor
 public class Client {
 
