@@ -23,10 +23,10 @@ class ClientServiceTest {
     private RestTemplate restTemplate;
 
     private static final TokenDto TOKEN_DTO = TokenDto.builder()
-            .access_token("asd")
-            .token_type("dsa")
-            .refresh_type("sda")
-            .expires_in(60)
+            .accessToken("asd")
+            .tokenType("dsa")
+            .refreshType("sda")
+            .expiresIn(60)
             .scope("read")
             .build();
 
@@ -35,10 +35,10 @@ class ClientServiceTest {
         var request = new HttpEntity<>(new UserDto("admin", "admin", "password"));
         when(restTemplate.postForObject("http://localhost:8080/oauth/token", request, TokenDto.class)).thenReturn(TOKEN_DTO);
         var token = clientService.getToken();
-        assertEquals(TOKEN_DTO.getAccess_token(), token.getAccess_token());
-        assertEquals(TOKEN_DTO.getToken_type(), token.getToken_type());
-        assertEquals(TOKEN_DTO.getRefresh_type(), token.getRefresh_type());
-        assertEquals(TOKEN_DTO.getExpires_in(), token.getExpires_in());
+        assertEquals(TOKEN_DTO.getAccessToken(), token.getAccessToken());
+        assertEquals(TOKEN_DTO.getTokenType(), token.getTokenType());
+        assertEquals(TOKEN_DTO.getRefreshType(), token.getRefreshType());
+        assertEquals(TOKEN_DTO.getExpiresIn(), token.getExpiresIn());
         assertEquals(TOKEN_DTO.getScope(), token.getScope());
     }
 }
