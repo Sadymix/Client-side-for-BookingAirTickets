@@ -4,5 +4,17 @@ app:
   user:
     name: admin
     password: admin
+    grantType: password
   token:
     url: http://localhost:8080/oauth/token
+  client:
+    clientId: ClientId
+    secret: secret
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          client:
+            RestTemplate: DEBUG
