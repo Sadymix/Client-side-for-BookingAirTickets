@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,13 +26,9 @@ class AuthenticationClientTest {
     @Mock
     private RestTemplate authRestTemplate;
 
-    @Value("${app.user.name}")
     private String username;
-    @Value("${app.user.password}")
     private String password;
-    @Value("${app.user.grantType}")
     private String grantType;
-    @Value("${app.token.url}")
     private String tokenUrl;
 
     private static final Token TOKEN_DTO = Token.builder()
