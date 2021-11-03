@@ -12,14 +12,16 @@ import org.springframework.web.client.RestTemplate;
 public class BeanConfiguration {
 
     private final RestTemplateBuilder builder;
-    @Value("${app.user.name}")
-    private String username;
-    @Value("${app.user.password}")
-    private String password;
+    @Value("${app.client.clientId}")
+    private String clientId;
+    @Value("${app.client.secret}")
+    private String secret;
 
 
     @Bean
-    public RestTemplate restTemplate() {
-        return builder.basicAuthentication(username, password).build();
+    public RestTemplate authRestTemplate() {
+        return builder
+                .basicAuthentication(clientId, secret)
+                .build();
     }
 }
