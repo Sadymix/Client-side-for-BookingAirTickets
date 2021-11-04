@@ -5,10 +5,13 @@ app:
     grantType: password
   token:
     url: http://localhost:8080/oauth/token
+  get:
+    single:
+      user:
+        url: http://localhost:8080/api/users
   client:
     clientId: ClientId
     secret: secret
-
 logging:
   level:
     org:
@@ -16,3 +19,8 @@ logging:
         web:
           client:
             RestTemplate: DEBUG
+spring:
+  profiles:
+    active: smoke-test
+  main:
+    web-application-type: none
