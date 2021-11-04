@@ -1,0 +1,90 @@
+package com.pgs.client.service;
+
+import com.pgs.client.component.Client;
+import com.pgs.client.dto.UserDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class UserClient {
+
+    private final RestTemplate restTemplate;
+
+    @Value("${app.get.single.user.url}")
+    private String apiUsersUrl;
+
+    public UserDto getSingleUser(Long id) {
+        HttpHeaders headers = setHeaders();
+        var request = new HttpEntity<>(headers);
+        return restTemplate.exchange(
+                apiUsersUrl + "/" + id,
+                HttpMethod.GET,
+                request,
+                UserDto.class).getBody();
+    }
+
+    public UserDto addUser(UserDto userDto) {
+        HttpHeaders headers = setHeaders();
+        var request = new HttpEntity<>(userDto, headers);
+        return restTemplate.exchange(
+                apiUsersUrl,
+                HttpMethod.POST,
+                request,
+                UserDto.class).getBody();
+    }
+
+    public UserDto activateUser(Long id) {
+        MultiValueMap<String, Boolean> requestBody = new LinkedMultiValueMap<>();
+        requestBody.set("enabled", true);
+        HttpHeaders headers = setHeaders();
+        var request = new HttpEntity<>(requestBody, headers);
+        return restTemplate.exchange(
+                apiUsersUrl + "/" + id + "/activate",
+                HttpMethod.PUT,
+                request,
+                UserDto.class).getBody();
+    }
+
+    public UserDto deactivateUser(Long id) {
+        MultiValueMap<String, Boolean> requestBody = new LinkedMultiValueMap<>();
+        requestBody.set("enabled", false);
+        HttpHeaders headers = setHeaders();
+        var request = new HttpEntity<>(requestBody, headers);
+        return restTemplate.exchange(
+                apiUsersUrl + "/" + id + "/deactivate",
+                HttpMethod.PUT,
+                request,
+                UserDto.class).getBody();
+    }
+
+    public UserDto setUserRoles(Long id, List<String> roleList) {
+        MultiValueMap<String, List<String>> requestBody = new LinkedMultiValueMap<>();
+        requestBody.set("roles", roleList);
+        HttpHeaders headers = setHeaders();
+        var request = new HttpEntity<>(requestBody, headers);
+        return restTemplate.exchange(
+                apiUsersUrl + "/" + id + "/setRoles",
+                HttpMethod.PUT,
+                request,
+                UserDto.class).getBody();
+    }
+
+    private HttpHeaders setHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(Client.TOKEN);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        return headers;
+    }
+}
