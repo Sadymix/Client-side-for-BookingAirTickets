@@ -17,11 +17,15 @@ public class BeanConfiguration {
     @Value("${app.client.secret}")
     private String secret;
 
-
     @Bean
     public RestTemplate authRestTemplate() {
         return builder
                 .basicAuthentication(clientId, secret)
                 .build();
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
