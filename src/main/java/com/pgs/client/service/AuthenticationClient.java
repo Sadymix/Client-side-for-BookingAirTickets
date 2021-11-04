@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class AuthenticationClient {
 
-    public final RestTemplate authRestTemplate;
+    private final RestTemplate authRestTemplate;
 
     @Value("${app.user.name}")
     private String username;
