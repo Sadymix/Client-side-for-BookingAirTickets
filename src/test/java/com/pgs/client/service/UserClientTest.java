@@ -36,9 +36,12 @@ class UserClientTest {
 
     private static final String URL = "http://localhost:8080/api/users";
     private static final UserDto USER_DTO = UserDto.builder()
-            .id(1L)
             .username("user1")
             .password("password1")
+            .accountNonExpired(true)
+            .accountNonLocked(true)
+            .credentialsNonExpired(true)
+            .enabled(false)
             .roles(List.of("ADMIN"))
             .build();
 
@@ -78,11 +81,37 @@ class UserClientTest {
         assertThat(request.getBody()).isEqualTo(USER_DTO);
     }
 
-    private HttpEntity<Object> setUpGetSingleUserRequest() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(Client.TOKEN);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        return new HttpEntity<>(headers);
+
+
+    @Test
+    void testActivateUser() {
+        when(restTemplate.exchange(eq(URL+"/1/activate"), eq(HttpMethod.PUT),
+                any(HttpEntity.class), eq(UserDto.class)))
+                .thenReturn(responseEntity);
+        userClient.activateUser(1L);
+        verify(restTemplate).exchange(anyString(), any(HttpMethod.class), requestCaptor.capture(), any(Class.class));
+        var request = requestCaptor.getValue();
+        assertThat(request.getBody()).isEqualTo(USER_DTO);
+    }
+
+    @Test
+    void testDeactivateUser() {
+        when(restTemplate.exchange(eq(URL+"/1/deactivate"), eq(HttpMethod.PUT),
+                any(HttpEntity.class), eq(UserDto.class)))
+                .thenReturn(responseEntity);
+        userClient.activateUser(1L);
+        verify(restTemplate).exchange(anyString(), any(HttpMethod.class), requestCaptor.capture(), any(Class.class));
+        var request = requestCaptor.getValue();
+        assertThat(request.getBody().isEnabled()).isEqualTo(USER_DTO.isEnabled());
+    }
+    @Test
+    void testSetRoles() {
+        when(restTemplate.exchange(eq(URL+"/1/setRoles"), eq(HttpMethod.PUT),
+                any(HttpEntity.class), eq(UserDto.class)))
+                .thenReturn(responseEntity);
+        userClient.activateUser(1L);
+        verify(restTemplate).exchange(anyString(), any(HttpMethod.class), requestCaptor.capture(), any(Class.class));
+        var request = requestCaptor.getValue();
+        assertThat(request.getBody().isEnabled()).isEqualTo(USER_DTO.isEnabled());
     }
 }
