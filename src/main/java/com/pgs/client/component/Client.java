@@ -21,6 +21,15 @@ public class Client {
     private final UserClient userClient;
 
     public static String TOKEN;
+    private static UserDto userDto = UserDto.builder()
+            .username("user0")
+            .password("pass0")
+            .accountNonExpired(true)
+            .accountNonLocked(true)
+            .credentialsNonExpired(true)
+            .enabled(true)
+            .roles(List.of("USER"))
+            .build();
 
     @PostConstruct
     public void postConstructGetToken() {
@@ -29,13 +38,13 @@ public class Client {
         TOKEN = token.getAccessToken();
         var singleUser = userClient.getSingleUser(1L);
         log.info("Single User: {}" , singleUser);
-        var addUser = userClient.addUser(new UserDto());
+        var addUser = userClient.addUser(userDto);
         log.info("Added User: {}", addUser);
         var deactivateUser = userClient.deactivateUser(1L);
         log.info("Deactivate User: {}", deactivateUser);
         var activateUser = userClient.activateUser(1L);
         log.info("Activated User: {}", activateUser);
-        var setRolesUser = userClient.setUserRoles(1L, List.of("USER", "ADMIN", "STAFF"));
+        var setRolesUser = userClient.setUserRoles(1L, List.of("USER", "STAFF"));
         log.info("Set Roles User: {}", setRolesUser);
     }
 }
