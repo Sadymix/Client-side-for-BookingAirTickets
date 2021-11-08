@@ -9,8 +9,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -45,10 +43,8 @@ public class UserClient {
     }
 
     public UserDto activateUser(Long id) {
-        MultiValueMap<String, Boolean> requestBody = new LinkedMultiValueMap<>();
-        requestBody.set("enabled", true);
         HttpHeaders headers = setHeaders();
-        var request = new HttpEntity<>(requestBody, headers);
+        var request = new HttpEntity<>(headers);
         return restTemplate.exchange(
                 apiUsersUrl + "/" + id + "/activate",
                 HttpMethod.PUT,
@@ -57,10 +53,8 @@ public class UserClient {
     }
 
     public UserDto deactivateUser(Long id) {
-        MultiValueMap<String, Boolean> requestBody = new LinkedMultiValueMap<>();
-        requestBody.set("enabled", false);
         HttpHeaders headers = setHeaders();
-        var request = new HttpEntity<>(requestBody, headers);
+        var request = new HttpEntity<>(headers);
         return restTemplate.exchange(
                 apiUsersUrl + "/" + id + "/deactivate",
                 HttpMethod.PUT,
@@ -69,10 +63,8 @@ public class UserClient {
     }
 
     public UserDto setUserRoles(Long id, List<String> roleList) {
-        MultiValueMap<String, List<String>> requestBody = new LinkedMultiValueMap<>();
-        requestBody.set("roles", roleList);
         HttpHeaders headers = setHeaders();
-        var request = new HttpEntity<>(requestBody, headers);
+        var request = new HttpEntity<>(roleList, headers);
         return restTemplate.exchange(
                 apiUsersUrl + "/" + id + "/setRoles",
                 HttpMethod.PUT,
