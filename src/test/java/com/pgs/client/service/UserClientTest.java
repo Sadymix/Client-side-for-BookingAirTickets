@@ -10,13 +10,17 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -81,17 +85,14 @@ class UserClientTest {
         assertThat(request.getBody()).isEqualTo(USER_DTO);
     }
 
-
-
     @Test
     void testActivateUser() {
-        when(restTemplate.exchange(eq(URL+"/1/activate"), eq(HttpMethod.PUT),
+        when(restTemplate.exchange(eq(URL + "/1/activate"), eq(HttpMethod.PUT),
                 any(HttpEntity.class), eq(UserDto.class)))
                 .thenReturn(responseEntity);
-        userClient.activateUser(1L);
+        var userDto = userClient.activateUser(1L);
         verify(restTemplate).exchange(anyString(), any(HttpMethod.class), requestCaptor.capture(), any(Class.class));
-        var request = requestCaptor.getValue();
-        assertThat(request.getBody()).isEqualTo(USER_DTO);
+        assertEquals(userDto.isEnabled(), USER_DTO.isEnabled());
     }
 
     @Test
@@ -99,19 +100,17 @@ class UserClientTest {
         when(restTemplate.exchange(eq(URL+"/1/deactivate"), eq(HttpMethod.PUT),
                 any(HttpEntity.class), eq(UserDto.class)))
                 .thenReturn(responseEntity);
-        userClient.activateUser(1L);
+        var userDto = userClient.deactivateUser(1L);
         verify(restTemplate).exchange(anyString(), any(HttpMethod.class), requestCaptor.capture(), any(Class.class));
-        var request = requestCaptor.getValue();
-        assertThat(request.getBody().isEnabled()).isEqualTo(USER_DTO.isEnabled());
+        assertEquals(userDto.isEnabled(), USER_DTO.isEnabled());
     }
     @Test
     void testSetRoles() {
         when(restTemplate.exchange(eq(URL+"/1/setRoles"), eq(HttpMethod.PUT),
                 any(HttpEntity.class), eq(UserDto.class)))
                 .thenReturn(responseEntity);
-        userClient.activateUser(1L);
+        var userDto = userClient.setUserRoles(1L, List.of("ADMIN", "USER"));
         verify(restTemplate).exchange(anyString(), any(HttpMethod.class), requestCaptor.capture(), any(Class.class));
-        var request = requestCaptor.getValue();
-        assertThat(request.getBody().isEnabled()).isEqualTo(USER_DTO.isEnabled());
+        assertEquals(userDto.getRoles(), USER_DTO.getRoles());
     }
 }
