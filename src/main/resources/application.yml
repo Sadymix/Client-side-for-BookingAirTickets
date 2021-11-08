@@ -21,6 +21,5 @@ logging:
 spring:
   profiles:
     active: smoke-test
-    default: dev
   main:
     web-application-type: none
