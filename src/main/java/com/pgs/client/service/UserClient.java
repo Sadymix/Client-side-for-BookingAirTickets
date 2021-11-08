@@ -19,7 +19,7 @@ public class UserClient {
 
     private final RestTemplate restTemplate;
 
-    @Value("${app.get.single.user.url}")
+    @Value("${app.url.user}")
     private String apiUsersUrl;
 
     public UserDto getSingleUser(Long id) {
