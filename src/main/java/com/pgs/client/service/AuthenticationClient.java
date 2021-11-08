@@ -23,7 +23,7 @@ public class AuthenticationClient {
     private String password;
     @Value("${app.user.grantType}")
     private String grantType;
-    @Value("${app.token.url}")
+    @Value("${app.url.token}")
     private String tokenUrl;
 
     public Token getToken() {

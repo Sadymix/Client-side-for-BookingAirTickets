@@ -19,11 +19,11 @@ public class UserClient {
 
     private final RestTemplate restTemplate;
 
-    @Value("${app.get.single.user.url}")
+    @Value("${app.url.user}")
     private String apiUsersUrl;
 
     public UserDto getSingleUser(Long id) {
-        HttpHeaders headers = setHeaders();
+        HttpHeaders headers = getHeaders();
         var request = new HttpEntity<>(headers);
         return restTemplate.exchange(
                 apiUsersUrl + "/" + id,
@@ -33,7 +33,7 @@ public class UserClient {
     }
 
     public UserDto addUser(UserDto userDto) {
-        HttpHeaders headers = setHeaders();
+        HttpHeaders headers = getHeaders();
         var request = new HttpEntity<>(userDto, headers);
         return restTemplate.exchange(
                 apiUsersUrl,
@@ -43,27 +43,15 @@ public class UserClient {
     }
 
     public UserDto activateUser(Long id) {
-        HttpHeaders headers = setHeaders();
-        var request = new HttpEntity<>(headers);
-        return restTemplate.exchange(
-                apiUsersUrl + "/" + id + "/activate",
-                HttpMethod.PUT,
-                request,
-                UserDto.class).getBody();
+        return setUserEnabled(apiUsersUrl+"/"+id+"/activate");
     }
 
     public UserDto deactivateUser(Long id) {
-        HttpHeaders headers = setHeaders();
-        var request = new HttpEntity<>(headers);
-        return restTemplate.exchange(
-                apiUsersUrl + "/" + id + "/deactivate",
-                HttpMethod.PUT,
-                request,
-                UserDto.class).getBody();
+        return setUserEnabled(apiUsersUrl+"/"+id+"/deactivate");
     }
 
     public UserDto setUserRoles(Long id, List<String> roleList) {
-        HttpHeaders headers = setHeaders();
+        HttpHeaders headers = getHeaders();
         var request = new HttpEntity<>(roleList, headers);
         return restTemplate.exchange(
                 apiUsersUrl + "/" + id + "/setRoles",
@@ -72,11 +60,21 @@ public class UserClient {
                 UserDto.class).getBody();
     }
 
-    private HttpHeaders setHeaders() {
+    private HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(Client.TOKEN);
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return headers;
+    }
+
+    private UserDto setUserEnabled(String url) {
+        HttpHeaders headers = getHeaders();
+        var request = new HttpEntity<Object>(headers);
+        return restTemplate.exchange(
+                url,
+                HttpMethod.PUT,
+                request,
+                UserDto.class).getBody();
     }
 }

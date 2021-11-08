@@ -32,7 +32,7 @@ public class Client {
             .build();
 
     @PostConstruct
-    public void postConstructGetToken() {
+    public void postConstruct() {
         var token = authenticationClient.getToken();
         log.info("Token: {}", token);
         TOKEN = token.getAccessToken();
