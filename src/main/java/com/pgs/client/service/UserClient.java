@@ -4,7 +4,6 @@ import com.pgs.client.component.Client;
 import com.pgs.client.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,7 +15,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Profile("default")
 public class UserClient {
 
     private final RestTemplate restTemplate;
