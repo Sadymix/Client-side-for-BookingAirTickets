@@ -45,21 +45,13 @@ public class UserClient {
     public UserDto activateUser(Long id) {
         HttpHeaders headers = setHeaders();
         var request = new HttpEntity<>(headers);
-        return restTemplate.exchange(
-                apiUsersUrl + "/" + id + "/activate",
-                HttpMethod.PUT,
-                request,
-                UserDto.class).getBody();
+        return setUserEnabled(apiUsersUrl+"/"+id+"/activate", request);
     }
 
     public UserDto deactivateUser(Long id) {
         HttpHeaders headers = setHeaders();
         var request = new HttpEntity<>(headers);
-        return restTemplate.exchange(
-                apiUsersUrl + "/" + id + "/deactivate",
-                HttpMethod.PUT,
-                request,
-                UserDto.class).getBody();
+        return setUserEnabled(apiUsersUrl+"/"+id+"/deactivate", request);
     }
 
     public UserDto setUserRoles(Long id, List<String> roleList) {
@@ -78,5 +70,13 @@ public class UserClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return headers;
+    }
+
+    private UserDto setUserEnabled(String url, HttpEntity request) {
+        return restTemplate.exchange(
+                url,
+                HttpMethod.PUT,
+                request,
+                UserDto.class).getBody();
     }
 }
