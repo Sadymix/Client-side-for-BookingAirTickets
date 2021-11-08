@@ -19,7 +19,6 @@ logging:
           client:
             RestTemplate: DEBUG
 spring:
-  profiles:
-    active: smoke-test
+
   main:
     web-application-type: none
