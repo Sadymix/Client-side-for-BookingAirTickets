@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class AuthenticationClient {
 
-    public final RestTemplate authRestTemplate;
+    private final RestTemplate authRestTemplate;
 
     @Value("${app.user.name}")
     private String username;
@@ -23,7 +23,7 @@ public class AuthenticationClient {
     private String password;
     @Value("${app.user.grantType}")
     private String grantType;
-    @Value("${app.token.url}")
+    @Value("${app.url.token}")
     private String tokenUrl;
 
     public Token getToken() {

@@ -3,12 +3,14 @@ app:
     name: admin
     password: admin
     grantType: password
-  token:
-    url: http://localhost:8080/oauth/token
+  url:
+    base: http://localhost:8080
+    token: ${app.url.base}/oauth/token
+    api: ${app.url.base}/api
+    user: ${app.url.api}/users
   client:
     clientId: ClientId
     secret: secret
-
 logging:
   level:
     org:
@@ -16,3 +18,7 @@ logging:
         web:
           client:
             RestTemplate: DEBUG
+spring:
+
+  main:
+    web-application-type: none
