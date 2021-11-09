@@ -1,43 +1,75 @@
 package com.pgs.client.interceptor;
 
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
+@Component
+@RequiredArgsConstructor
 public class LoggingInterceptor implements ClientHttpRequestInterceptor {
 
-
     @Override
-    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-        ClientHttpResponse response = execution.execute(request, body);
-        logRequest(request, body);
-        logResponse(response);
-        return response;
+    @SneakyThrows(IOException.class)
+    public ClientHttpResponse intercept(
+            HttpRequest request,
+            byte[] body,
+            ClientHttpRequestExecution execution){
+
+        var logRequestData = setUpLogRequestData(request, body);
+        LogResponseData logResponseData = null;
+        try {
+            var response = execution.execute(request, body);
+            logResponseData = setUpLogResponseData(response);
+            return response;
+        } finally {
+            if (logResponseData == null) {
+                logResponseData = new LogResponseData(null, null, null);
+            }
+            log.info("""
+                            
+                            REQUEST
+                            URL: {}
+                            Method: {}
+                            Headers: {}
+                            Body: {}
+                            RESPONSE
+                            Status: {}
+                            Headers: {}
+                            Body: {}
+                            """,
+                    logRequestData.url, logRequestData.method, logRequestData.requestHeaders, logRequestData.requestBody,
+                    logResponseData.statusCode, logResponseData.headers, logResponseData.body);
+        }
     }
 
-    private void logRequest(HttpRequest request, byte[] body) throws IOException {
-        log.info("===========================request begin================================================");
-        log.info("URI         : {}", request.getURI());
-        log.info("Method      : {}", request.getMethod());
-        log.info("Headers     : {}", request.getHeaders());
-        log.info("Request body: {}", new String(body, "UTF-8"));
-        log.info("==========================request end================================================");
-
+    private record LogRequestData(URI url, HttpMethod method, HttpHeaders requestHeaders, String requestBody) {
     }
 
-    private void logResponse(ClientHttpResponse response) throws IOException {
-        log.info("============================response begin==========================================");
-        log.info("Status code  : {}", response.getStatusCode());
-        log.info("Status text  : {}", response.getStatusText());
-        log.info("Headers      : {}", response.getHeaders());
-        log.info("Response body: {}", StreamUtils.copyToString(response.getBody(), Charset.defaultCharset()));
-        log.info("=======================response end=================================================");
+    private record LogResponseData(HttpStatus statusCode, HttpHeaders headers, String body) {
+    }
+
+    private LogRequestData setUpLogRequestData(HttpRequest request, byte[] body) {
+        return new LogRequestData(request.getURI(), request.getMethod(), request.getHeaders(), new String(body));
+    }
+
+    private LogResponseData setUpLogResponseData(ClientHttpResponse response) throws IOException {
+        return new LogResponseData(
+                response.getStatusCode(),
+                response.getHeaders(),
+                StreamUtils.copyToString(response.getBody(), StandardCharsets.UTF_8));
     }
 }
