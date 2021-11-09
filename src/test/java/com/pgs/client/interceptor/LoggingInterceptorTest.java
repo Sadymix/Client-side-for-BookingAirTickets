@@ -41,12 +41,12 @@ class LoggingInterceptorTest {
     @InjectMocks
     private LoggingInterceptor loggingInterceptor;
 
-    private static byte[] ARR = new byte[20];
+    private static byte[] BODY = new byte[20];
 
     @SneakyThrows
     @BeforeEach
     void setUp() {
-        new Random().nextBytes(ARR);
+        new Random().nextBytes(BODY);
         when(httpRequest.getURI())
                 .thenReturn(new URI("http:localhost:8080/1"));
         when(httpRequest.getMethod())
@@ -58,16 +58,16 @@ class LoggingInterceptorTest {
     @SneakyThrows
     @Test
     void testIntercept(CapturedOutput capturedOutput) {
-        String bodyString = StreamUtils.copyToString(new ByteArrayInputStream(ARR), StandardCharsets.UTF_8);
-        when(clientHttpRequestExecution.execute(httpRequest, ARR))
+        String bodyString = StreamUtils.copyToString(new ByteArrayInputStream(BODY), StandardCharsets.UTF_8);
+        when(clientHttpRequestExecution.execute(httpRequest, BODY))
                 .thenReturn(clientHttpResponse);
         when(clientHttpResponse.getStatusCode())
                 .thenReturn(HttpStatus.OK);
         when(clientHttpResponse.getHeaders())
                 .thenReturn(new HttpHeaders(getValueMap()));
         when(clientHttpResponse.getBody())
-                .thenReturn(new ByteArrayInputStream(ARR));
-        loggingInterceptor.intercept(httpRequest, ARR, clientHttpRequestExecution);
+                .thenReturn(new ByteArrayInputStream(BODY));
+        loggingInterceptor.intercept(httpRequest, BODY, clientHttpRequestExecution);
 
         assertThat(capturedOutput.getOut()).contains("URL: http:localhost:8080/1");
         assertThat(capturedOutput.getOut()).contains("Method: GET");
@@ -78,14 +78,14 @@ class LoggingInterceptorTest {
 
     @SneakyThrows
     @Test
-    void testIntercept_badRequest(CapturedOutput capturedOutput) {
+    void testIntercept_failedRequest(CapturedOutput capturedOutput) {
 
-        String bodyString = StreamUtils.copyToString(new ByteArrayInputStream(ARR), StandardCharsets.UTF_8);
-        when(clientHttpRequestExecution.execute(httpRequest, ARR))
+        String bodyString = StreamUtils.copyToString(new ByteArrayInputStream(BODY), StandardCharsets.UTF_8);
+        when(clientHttpRequestExecution.execute(httpRequest, BODY))
                 .thenThrow(RuntimeException.class);
 
         assertThrows(RuntimeException.class,
-                () -> loggingInterceptor.intercept(httpRequest, ARR, clientHttpRequestExecution));
+                () -> loggingInterceptor.intercept(httpRequest, BODY, clientHttpRequestExecution));
         assertThat(capturedOutput.getOut()).contains("URL: http:localhost:8080/1");
         assertThat(capturedOutput.getOut()).contains("Method: GET");
         assertThat(capturedOutput.getOut()).contains("Headers: [headers:\"headers\"]");
