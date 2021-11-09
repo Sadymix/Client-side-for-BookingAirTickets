@@ -1,5 +1,6 @@
 package com.pgs.client.configuration;
 
+import com.pgs.client.interceptor.LoggingInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -25,7 +26,9 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    public RestTemplate restTemplate(LoggingInterceptor loggingInterceptor) {
+        return builder
+                .additionalInterceptors(loggingInterceptor)
+                .build();
     }
 }

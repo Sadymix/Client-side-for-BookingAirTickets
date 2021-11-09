@@ -70,7 +70,7 @@ public class UserClient {
 
     private UserDto setUserEnabled(String url) {
         HttpHeaders headers = getHeaders();
-        var request = new HttpEntity<Object>(headers);
+        var request = new HttpEntity<>(headers);
         return restTemplate.exchange(
                 url,
                 HttpMethod.PUT,
