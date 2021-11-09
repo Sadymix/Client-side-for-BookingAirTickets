@@ -20,9 +20,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StreamUtils;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
@@ -43,19 +41,18 @@ class LoggingInterceptorTest {
     @InjectMocks
     private LoggingInterceptor loggingInterceptor;
 
-    private static MultiValueMap<String, String> HEADERS = new LinkedMultiValueMap<>();
     private static byte[] ARR = new byte[20];
+
     @SneakyThrows
     @BeforeEach
-    void setUp(){
+    void setUp() {
         new Random().nextBytes(ARR);
-        HEADERS.add("header", "header");
         when(httpRequest.getURI())
                 .thenReturn(new URI("http:localhost:8080/1"));
         when(httpRequest.getMethod())
                 .thenReturn(HttpMethod.GET);
         when(httpRequest.getHeaders())
-                .thenReturn(new HttpHeaders(HEADERS));
+                .thenReturn(new HttpHeaders(getValueMap()));
     }
 
     @SneakyThrows
@@ -67,21 +64,21 @@ class LoggingInterceptorTest {
         when(clientHttpResponse.getStatusCode())
                 .thenReturn(HttpStatus.OK);
         when(clientHttpResponse.getHeaders())
-                .thenReturn(new HttpHeaders(HEADERS));
+                .thenReturn(new HttpHeaders(getValueMap()));
         when(clientHttpResponse.getBody())
                 .thenReturn(new ByteArrayInputStream(ARR));
         loggingInterceptor.intercept(httpRequest, ARR, clientHttpRequestExecution);
 
         assertThat(capturedOutput.getOut()).contains("URL: http:localhost:8080/1");
         assertThat(capturedOutput.getOut()).contains("Method: GET");
-        assertThat(capturedOutput.getOut()).contains("Headers: [header:\"header\"]");
+        assertThat(capturedOutput.getOut()).contains("Headers: [headers:\"headers\"]");
         assertThat(capturedOutput.getOut()).contains("Status: 200 OK");
         assertThat(capturedOutput.getOut()).contains("Body: " + bodyString);
     }
 
-
+    @SneakyThrows
     @Test
-    void testIntercept_badRequest(CapturedOutput capturedOutput) throws IOException, URISyntaxException {
+    void testIntercept_badRequest(CapturedOutput capturedOutput) {
 
         String bodyString = StreamUtils.copyToString(new ByteArrayInputStream(ARR), StandardCharsets.UTF_8);
         when(clientHttpRequestExecution.execute(httpRequest, ARR))
@@ -91,8 +88,14 @@ class LoggingInterceptorTest {
                 () -> loggingInterceptor.intercept(httpRequest, ARR, clientHttpRequestExecution));
         assertThat(capturedOutput.getOut()).contains("URL: http:localhost:8080/1");
         assertThat(capturedOutput.getOut()).contains("Method: GET");
-        assertThat(capturedOutput.getOut()).contains("Headers: [header:\"header\"]");
+        assertThat(capturedOutput.getOut()).contains("Headers: [headers:\"headers\"]");
         assertThat(capturedOutput.getOut()).contains("Body: " + bodyString);
+    }
+
+    private MultiValueMap<String, String> getValueMap() {
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add("headers", "headers");
+        return headers;
     }
 
 }
