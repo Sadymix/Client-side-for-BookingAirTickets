@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.system.CapturedOutput;
@@ -35,11 +34,11 @@ class LoggingInterceptorTest {
     @Mock
     private HttpRequest httpRequest;
     @Mock
-    private ClientHttpRequestExecution clientHttpRequestExecution;
+    private ClientHttpRequestExecution clientHttpRequestExecution ;
     @Mock
     private ClientHttpResponse clientHttpResponse;
-    @InjectMocks
-    private LoggingInterceptor loggingInterceptor;
+
+    private LoggingInterceptor loggingInterceptor = new LoggingInterceptor();
 
     private static byte[] BODY = new byte[20];
 
