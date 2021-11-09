@@ -35,7 +35,7 @@ class AuthenticationClientTest {
     private static final Token TOKEN_DTO = Token.builder()
             .accessToken("asd")
             .tokenType("dsa")
-            .refreshType("sda")
+            .refreshToken("sda")
             .expiresIn(60)
             .scope("read")
             .build();
@@ -53,7 +53,7 @@ class AuthenticationClientTest {
         verify(authRestTemplate).postForObject(TOKEN_URL, setUpRequest(), Token.class);
         assertEquals(TOKEN_DTO.getAccessToken(), token.getAccessToken());
         assertEquals(TOKEN_DTO.getTokenType(), token.getTokenType());
-        assertEquals(TOKEN_DTO.getRefreshType(), token.getRefreshType());
+        assertEquals(TOKEN_DTO.getRefreshToken(), token.getRefreshToken());
         assertEquals(TOKEN_DTO.getExpiresIn(), token.getExpiresIn());
         assertEquals(TOKEN_DTO.getScope(), token.getScope());
     }
