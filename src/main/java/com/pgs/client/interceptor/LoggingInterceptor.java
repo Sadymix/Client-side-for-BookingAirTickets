@@ -22,6 +22,12 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class LoggingInterceptor implements ClientHttpRequestInterceptor {
 
+    private record LogRequestData(URI url, HttpMethod method, HttpHeaders requestHeaders, String requestBody) {
+    }
+
+    private record LogResponseData(HttpStatus statusCode, HttpHeaders headers, String body) {
+    }
+
     @Override
     @SneakyThrows(IOException.class)
     public ClientHttpResponse intercept(
@@ -55,13 +61,6 @@ public class LoggingInterceptor implements ClientHttpRequestInterceptor {
                     logResponseData.statusCode, logResponseData.headers, logResponseData.body);
         }
     }
-
-    private record LogRequestData(URI url, HttpMethod method, HttpHeaders requestHeaders, String requestBody) {
-    }
-
-    private record LogResponseData(HttpStatus statusCode, HttpHeaders headers, String body) {
-    }
-
     private LogRequestData setUpLogRequestData(HttpRequest request, byte[] body) {
         return new LogRequestData(request.getURI(), request.getMethod(), request.getHeaders(), new String(body));
     }
