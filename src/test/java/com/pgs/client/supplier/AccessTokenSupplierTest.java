@@ -2,6 +2,7 @@ package com.pgs.client.supplier;
 
 import com.pgs.client.dto.Token;
 import com.pgs.client.service.AuthenticationClient;
+import org.apache.commons.lang3.time.StopWatch;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +18,8 @@ class AccessTokenSupplierTest {
 
     @Mock
     private AuthenticationClient authenticationClient;
+    @Mock
+    private StopWatch stopWatch;
     @InjectMocks
     private AccessTokenSupplier accessTokenSupplier;
 

@@ -3,6 +3,7 @@ package com.pgs.client.interceptor;
 import com.pgs.client.supplier.AccessTokenSupplier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,6 +20,10 @@ class AuthenticationInterceptorTest {
 
     @Mock
     private AccessTokenSupplier accessTokenSupplier;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private HttpRequest httpRequest;
+    @Mock
+    private ClientHttpRequestExecution clientHttpRequestExecution;
     @InjectMocks
     private AuthenticationInterceptor authenticationInterceptor;
 
@@ -28,7 +33,11 @@ class AuthenticationInterceptorTest {
         new Random().nextBytes(body);
         when(accessTokenSupplier.supplyToken())
                 .thenReturn("ASDASD");
-        var intercept = authenticationInterceptor.intercept(mock(HttpRequest.class), body, mock(ClientHttpRequestExecution.class));
+        doNothing().when(httpRequest).getHeaders().setBearerAuth("1234");
+        var intercept = authenticationInterceptor.intercept(
+                httpRequest,
+                body,
+                clientHttpRequestExecution);
         verify(accessTokenSupplier).supplyToken();
         assertTrue(intercept.getHeaders().containsValue("ASDASD"));
     }

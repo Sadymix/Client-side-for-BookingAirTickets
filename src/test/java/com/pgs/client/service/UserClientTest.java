@@ -32,7 +32,6 @@ class UserClientTest {
     private ArgumentCaptor<HttpEntity<UserDto>> requestCaptor;
     @Mock
     private ResponseEntity<UserDto> responseEntity;
-
     @Mock
     private RestTemplate restTemplate;
     @InjectMocks
