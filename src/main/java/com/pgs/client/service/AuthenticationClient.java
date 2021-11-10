@@ -27,10 +27,16 @@ public class AuthenticationClient {
     private String tokenUrl;
 
     public Token getToken() {
+       return getTokenForGrantType(grantType);
+    }
+
+    public Token getTokenWithRefreshToken(Token token) {
+        return getTokenForGrantType(token.getRefreshToken());
+    }
+
+    private Token getTokenForGrantType(String grantType) {
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-        requestBody.add("grant_type", grantType);
-        requestBody.add("username", username);
-        requestBody.add("password", password);
+        setUpRequestBody(requestBody, grantType);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -40,5 +46,11 @@ public class AuthenticationClient {
                 tokenUrl,
                 request,
                 Token.class);
+    }
+
+    private void setUpRequestBody(MultiValueMap<String, String> requestBody, String grantType) {
+        requestBody.add("grant_type", grantType);
+        requestBody.add("username", username);
+        requestBody.add("password", password);
     }
 }
