@@ -16,10 +16,10 @@ public class AccessTokenSupplier {
 
     public synchronized String supplyToken() {
         accessToken = authenticationClient.getToken().getAccessToken();
-        if(stopWatch.getTime() == 0){
+        if (stopWatch.getTime() == 0) {
             stopWatch.start();
         }
-        if(stopWatch.getTime()>=3600000 || accessToken == null) {
+        if (stopWatch.getTime() >= 3600000 || accessToken == null) {
             stopWatch.reset();
             return authenticationClient.getToken().getAccessToken();
         }
