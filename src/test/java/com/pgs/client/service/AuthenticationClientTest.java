@@ -32,7 +32,7 @@ class AuthenticationClientTest {
     private static final String GRANT_TYPE = "password";
     private static final String TOKEN_URL = "http://localhost:8080/oauth/token";
 
-    private static final Token TOKEN_DTO = Token.builder()
+    private static final Token TOKEN = Token.builder()
             .accessToken("asd")
             .tokenType("dsa")
             .refreshToken("sda")
@@ -43,19 +43,32 @@ class AuthenticationClientTest {
     @BeforeEach
     void testGetTokenSetUp() {
         setAuthenticationClientFields();
-        when(authRestTemplate.postForObject(TOKEN_URL, setUpRequest(), Token.class))
-                .thenReturn(TOKEN_DTO);
     }
 
     @Test
     void testGetToken() {
+        when(authRestTemplate.postForObject(TOKEN_URL, setUpRequest(GRANT_TYPE), Token.class))
+                .thenReturn(TOKEN);
         var token = authenticationClient.getToken();
-        verify(authRestTemplate).postForObject(TOKEN_URL, setUpRequest(), Token.class);
-        assertEquals(TOKEN_DTO.getAccessToken(), token.getAccessToken());
-        assertEquals(TOKEN_DTO.getTokenType(), token.getTokenType());
-        assertEquals(TOKEN_DTO.getRefreshToken(), token.getRefreshToken());
-        assertEquals(TOKEN_DTO.getExpiresIn(), token.getExpiresIn());
-        assertEquals(TOKEN_DTO.getScope(), token.getScope());
+        verify(authRestTemplate).postForObject(TOKEN_URL, setUpRequest(GRANT_TYPE), Token.class);
+        assertEquals(TOKEN.getAccessToken(), token.getAccessToken());
+        assertEquals(TOKEN.getTokenType(), token.getTokenType());
+        assertEquals(TOKEN.getRefreshToken(), token.getRefreshToken());
+        assertEquals(TOKEN.getExpiresIn(), token.getExpiresIn());
+        assertEquals(TOKEN.getScope(), token.getScope());
+    }
+
+    @Test
+    void getTokenWithRefreshToken() {
+        when(authRestTemplate.postForObject(TOKEN_URL, setUpRequest(TOKEN.getRefreshToken()), Token.class))
+                .thenReturn(TOKEN);
+        var token = authenticationClient.getTokenWithRefreshToken(TOKEN);
+        verify(authRestTemplate).postForObject(TOKEN_URL, setUpRequest(TOKEN.getRefreshToken()), Token.class);
+        assertEquals(TOKEN.getAccessToken(), token.getAccessToken());
+        assertEquals(TOKEN.getTokenType(), token.getTokenType());
+        assertEquals(TOKEN.getRefreshToken(), token.getRefreshToken());
+        assertEquals(TOKEN.getExpiresIn(), token.getExpiresIn());
+        assertEquals(TOKEN.getScope(), token.getScope());
     }
 
     private void setAuthenticationClientFields() {
@@ -65,9 +78,9 @@ class AuthenticationClientTest {
         ReflectionTestUtils.setField(authenticationClient, "tokenUrl", TOKEN_URL);
     }
 
-    private HttpEntity<MultiValueMap<String, String>> setUpRequest() {
+    private HttpEntity<MultiValueMap<String, String>> setUpRequest(String grantType) {
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-        requestBody.add("grant_type", GRANT_TYPE);
+        requestBody.add("grant_type", grantType);
         requestBody.add("username", USERNAME);
         requestBody.add("password", PASSWORD);
         HttpHeaders headers = new HttpHeaders();
