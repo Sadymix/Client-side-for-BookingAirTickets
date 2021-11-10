@@ -1,6 +1,5 @@
 package com.pgs.client.supplier;
 
-import com.pgs.client.dto.Token;
 import com.pgs.client.service.AuthenticationClient;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.time.StopWatch;
@@ -11,17 +10,19 @@ import org.springframework.stereotype.Component;
 public class AccessTokenSupplier {
 
     private final AuthenticationClient authenticationClient;
-    private static Token TOKEN;
+    private String accessToken;
+    private final StopWatch stopWatch;
+
 
     public synchronized String supplyToken() {
-        var stopWatch = new StopWatch();
-        TOKEN = authenticationClient.getToken();
-        stopWatch.start();
-        if(stopWatch.getTime()<TOKEN.getExpiresIn()) {
-            return TOKEN.getAccessToken();
-        }else {
-            stopWatch.reset();
-            return authenticationClient.getTokenWithRefreshToken(TOKEN).getAccessToken();
+        accessToken = authenticationClient.getToken().getAccessToken();
+        if(stopWatch.getTime() == 0){
+            stopWatch.start();
         }
+        if(stopWatch.getTime()>=3600000 || accessToken == null) {
+            stopWatch.reset();
+            return authenticationClient.getToken().getAccessToken();
+        }
+        return accessToken;
     }
 }
