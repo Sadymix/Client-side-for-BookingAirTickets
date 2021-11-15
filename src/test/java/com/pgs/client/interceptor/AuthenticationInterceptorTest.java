@@ -1,7 +1,6 @@
 package com.pgs.client.interceptor;
 
 import com.pgs.client.dto.Token;
-import com.pgs.client.service.AuthenticationClient;
 import com.pgs.client.supplier.AccessTokenSupplier;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,8 +30,6 @@ import static org.mockito.Mockito.when;
 class AuthenticationInterceptorTest {
 
     @Mock
-    private AuthenticationClient authenticationClient;
-    @Mock
     private AccessTokenSupplier accessTokenSupplier;
     @Mock
     private HttpRequest httpRequest;
@@ -60,6 +57,7 @@ class AuthenticationInterceptorTest {
                 .thenReturn(clientHttpResponse);
         when(httpRequest.getHeaders())
                 .thenReturn(new HttpHeaders(getValueMap()));
+
     }
 
     @SneakyThrows
@@ -105,6 +103,5 @@ class AuthenticationInterceptorTest {
         headers.add("headers", "headers");
         headers.add("Authorization", "ASDASD");
         return headers;
-
     }
 }

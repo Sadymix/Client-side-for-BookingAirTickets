@@ -42,7 +42,12 @@ class AuthenticationClientTest {
 
     @BeforeEach
     void testGetTokenSetUp() {
-        setAuthenticationClientFields();
+        ReflectionTestUtils.setField(authenticationClient, "username", USERNAME);
+        ReflectionTestUtils.setField(authenticationClient, "password", PASSWORD);
+        ReflectionTestUtils.setField(authenticationClient, "grantType", GRANT_TYPE);
+        ReflectionTestUtils.setField(authenticationClient, "tokenUrl", TOKEN_URL);
+        when(authRestTemplate.postForObject(TOKEN_URL, setUpRequest(GRANT_TYPE), Token.class))
+                .thenReturn(TOKEN);
     }
 
     @Test
@@ -56,26 +61,6 @@ class AuthenticationClientTest {
         assertEquals(TOKEN.getRefreshToken(), token.getRefreshToken());
         assertEquals(TOKEN.getExpiresIn(), token.getExpiresIn());
         assertEquals(TOKEN.getScope(), token.getScope());
-    }
-
-    @Test
-    void getTokenWithRefreshToken() {
-        when(authRestTemplate.postForObject(TOKEN_URL, setUpRequest(TOKEN.getRefreshToken()), Token.class))
-                .thenReturn(TOKEN);
-        var token = authenticationClient.getTokenWithRefreshToken(TOKEN);
-        verify(authRestTemplate).postForObject(TOKEN_URL, setUpRequest(TOKEN.getRefreshToken()), Token.class);
-        assertEquals(TOKEN.getAccessToken(), token.getAccessToken());
-        assertEquals(TOKEN.getTokenType(), token.getTokenType());
-        assertEquals(TOKEN.getRefreshToken(), token.getRefreshToken());
-        assertEquals(TOKEN.getExpiresIn(), token.getExpiresIn());
-        assertEquals(TOKEN.getScope(), token.getScope());
-    }
-
-    private void setAuthenticationClientFields() {
-        ReflectionTestUtils.setField(authenticationClient, "username", USERNAME);
-        ReflectionTestUtils.setField(authenticationClient, "password", PASSWORD);
-        ReflectionTestUtils.setField(authenticationClient, "grantType", GRANT_TYPE);
-        ReflectionTestUtils.setField(authenticationClient, "tokenUrl", TOKEN_URL);
     }
 
     private HttpEntity<MultiValueMap<String, String>> setUpRequest(String grantType) {
