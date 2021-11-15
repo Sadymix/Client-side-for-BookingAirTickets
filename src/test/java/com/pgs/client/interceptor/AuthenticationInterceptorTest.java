@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -87,6 +87,22 @@ class AuthenticationInterceptorTest {
         }
         verify(authenticationClient).getToken();
         assertTrue(future.get().getHeaders().containsKey("Authorization"));
+    }
+
+    @SneakyThrows
+    @Test
+    void TestInterceptNewTokenAssigmentPastTTL() {
+        when(clientHttpResponse.getHeaders()).thenReturn(new HttpHeaders(getValueMap()));
+        var intercept = authenticationInterceptor.intercept(
+                httpRequest,
+                BODY,
+                clientHttpRequestExecution);
+        ReflectionTestUtils.setField(accessTokenSupplier, "ttl", 4000);
+        var intercept1 = authenticationInterceptor.intercept(
+                httpRequest,
+                BODY,
+                clientHttpRequestExecution);
+        assertNotEquals(intercept.getHeaders().getValuesAsList("Authorization").get(0),intercept1.getHeaders().getValuesAsList("Authorization").get(0));
     }
 
     private MultiValueMap<String, String> getValueMap() {
