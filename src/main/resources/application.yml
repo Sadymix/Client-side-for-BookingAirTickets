@@ -20,7 +20,7 @@ logging:
             RestTemplate: DEBUG
 security:
   token:
-    ttl: 1
+    ttl: PT1H
 spring:
   main:
     web-application-type: none
