@@ -18,6 +18,9 @@ logging:
         web:
           client:
             RestTemplate: DEBUG
+security:
+  token:
+    ttl: 3600
 spring:
 
   main:
