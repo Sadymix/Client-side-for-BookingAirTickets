@@ -27,14 +27,6 @@ public class AuthenticationClient {
     private String tokenUrl;
 
     public Token getToken() {
-       return getTokenForGrantType(grantType);
-    }
-
-    public Token getTokenWithRefreshToken(Token token) {
-        return getTokenForGrantType(token.getRefreshToken());
-    }
-
-    private Token getTokenForGrantType(String grantType) {
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         setUpRequestBody(requestBody, grantType);
 
