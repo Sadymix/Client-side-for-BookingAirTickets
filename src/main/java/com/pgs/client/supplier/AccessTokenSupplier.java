@@ -3,25 +3,27 @@ package com.pgs.client.supplier;
 import com.pgs.client.service.AuthenticationClient;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.time.StopWatch;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
 public class AccessTokenSupplier {
 
     private final AuthenticationClient authenticationClient;
-    private String accessToken;
-    private final StopWatch stopWatch;
-
+    private static String accessToken;
+    private StopWatch stopWatch = StopWatch.createStarted();
+    @Value("${spring.security.token.ttl}")
+    private int ttl;
 
     public synchronized String supplyToken() {
-        accessToken = authenticationClient.getToken().getAccessToken();
-        if (stopWatch.getTime() == 0) {
-            stopWatch.start();
-        }
-        if (stopWatch.getTime() >= 3600000 || accessToken == null) {
+        if (stopWatch.getTime(TimeUnit.SECONDS) >= ttl || accessToken == null || !stopWatch.isStarted()) {
+            accessToken = authenticationClient.getToken().getAccessToken();
             stopWatch.reset();
-            return authenticationClient.getToken().getAccessToken();
+            stopWatch.start();
+            return accessToken;
         }
         return accessToken;
     }
