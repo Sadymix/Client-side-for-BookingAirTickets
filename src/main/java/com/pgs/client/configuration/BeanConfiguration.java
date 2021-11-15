@@ -3,7 +3,6 @@ package com.pgs.client.configuration;
 import com.pgs.client.interceptor.AuthenticationInterceptor;
 import com.pgs.client.interceptor.LoggingInterceptor;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -32,10 +31,5 @@ public class BeanConfiguration {
         return builder
                 .additionalInterceptors(loggingInterceptor, authenticationInterceptor)
                 .build();
-    }
-
-    @Bean
-    public StopWatch stopWatch() {
-        return new StopWatch();
     }
 }
