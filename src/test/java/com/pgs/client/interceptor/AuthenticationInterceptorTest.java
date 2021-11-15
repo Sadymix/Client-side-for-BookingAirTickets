@@ -1,24 +1,29 @@
 package com.pgs.client.interceptor;
 
+import com.pgs.client.dto.Token;
+import com.pgs.client.service.AuthenticationClient;
 import com.pgs.client.supplier.AccessTokenSupplier;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
@@ -26,8 +31,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AuthenticationInterceptorTest {
 
-    @Mock
-    private AccessTokenSupplier accessTokenSupplier;
+    @Spy
+    private AuthenticationClient authenticationClient = new AuthenticationClient(mock(RestTemplate.class));
+    @Spy
+    private AccessTokenSupplier accessTokenSupplier = new AccessTokenSupplier(authenticationClient);
     @Mock
     private HttpRequest httpRequest;
     @Mock
@@ -37,49 +44,54 @@ class AuthenticationInterceptorTest {
     @Mock
     private ClientHttpResponse clientHttpResponse;
 
+    private static byte[] BODY = new byte[20];
+
+    private static final Token TOKEN = Token.builder()
+            .accessToken("ASDASD")
+            .build();
+
     @SneakyThrows
-    @Test
-    void intercept() {
-        byte[] body = new byte[20];
-        new Random().nextBytes(body);
+    @BeforeEach
+    void setUp() {
+        new Random().nextBytes(BODY);
+        ReflectionTestUtils.setField(accessTokenSupplier, "ttl", 3600);
+        when(authenticationClient.getToken()).thenReturn(TOKEN);
         when(accessTokenSupplier.supplyToken())
                 .thenReturn("ASDASD");
         when(httpRequest.getHeaders())
                 .thenReturn(new HttpHeaders(getValueMap()));
-        when(clientHttpRequestExecution.execute(httpRequest, body)).thenReturn(clientHttpResponse);
-        var intercept = authenticationInterceptor.intercept(
-                httpRequest,
-                body,
-                clientHttpRequestExecution);
-        verify(accessTokenSupplier).supplyToken();
-        verify(clientHttpRequestExecution).execute(httpRequest, body);
+        when(clientHttpRequestExecution.execute(httpRequest, BODY)).thenReturn(clientHttpResponse);
     }
 
+    @SneakyThrows
     @Test
-    void intercept_with10Threads() {
-        byte[] body = new byte[20];
-        new Random().nextBytes(body);
-        when(accessTokenSupplier.supplyToken())
-                .thenReturn("ASDASD");
-        when(httpRequest.getHeaders()).thenReturn(new HttpHeaders(getValueMap()));
-        ExecutorService service = Executors.newFixedThreadPool(10);
-        CountDownLatch latch = new CountDownLatch(10);
-        for (int i = 0; i < 10; i++) {
-            service.execute(() -> {
-                authenticationInterceptor.intercept(
-                        httpRequest,
-                        body,
-                        clientHttpRequestExecution);
-                latch.countDown();
-            });
-        }
+    void intercept() {
+        authenticationInterceptor.intercept(
+                httpRequest,
+                BODY,
+                clientHttpRequestExecution);
+        verify(clientHttpRequestExecution).execute(httpRequest, BODY);
         verify(accessTokenSupplier).supplyToken();
+        verify(authenticationClient).getToken();
+    }
+
+    @SneakyThrows
+    @Test
+    void TestIntercept10Threads() {
+        when(clientHttpResponse.getHeaders()).thenReturn(new HttpHeaders(getValueMap()));
+        ExecutorService service = Executors.newFixedThreadPool(10);
+        Future<ClientHttpResponse> future = null;
+        for (int i = 0; i < 10; i++) {
+            future = service.submit(() ->
+                    authenticationInterceptor.intercept(httpRequest, BODY, clientHttpRequestExecution));
+        }
+        verify(authenticationClient).getToken();
+        assertTrue(future.get().getHeaders().containsKey("Authorization"));
     }
 
     private MultiValueMap<String, String> getValueMap() {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("headers", "headers");
-        headers.add("Authorization", "");
         return headers;
     }
 
