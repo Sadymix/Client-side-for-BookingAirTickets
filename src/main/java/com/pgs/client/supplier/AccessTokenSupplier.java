@@ -15,7 +15,7 @@ public class AccessTokenSupplier {
     private final AuthenticationClient authenticationClient;
     private static String accessToken;
     private StopWatch stopWatch = StopWatch.createStarted();
-    @Value("${spring.security.token.ttl}")
+    @Value("${security.token.ttl}")
     private int ttl;
 
     public synchronized String supplyToken() {
