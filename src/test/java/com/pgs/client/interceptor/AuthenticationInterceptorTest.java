@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
@@ -18,23 +17,24 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationInterceptorTest {
 
-    @Spy
-    private AuthenticationClient authenticationClient = new AuthenticationClient(mock(RestTemplate.class));
-    @Spy
-    private AccessTokenSupplier accessTokenSupplier = new AccessTokenSupplier(authenticationClient);
+    @Mock
+    private AuthenticationClient authenticationClient;
+    @Mock
+    private AccessTokenSupplier accessTokenSupplier;
     @Mock
     private HttpRequest httpRequest;
     @Mock
@@ -55,17 +55,18 @@ class AuthenticationInterceptorTest {
     void setUp() {
         new Random().nextBytes(BODY);
         ReflectionTestUtils.setField(accessTokenSupplier, "ttl", 3600);
-        when(authenticationClient.getToken()).thenReturn(TOKEN);
+        when(authenticationClient.getToken())
+                .thenReturn(TOKEN);
         when(accessTokenSupplier.supplyToken())
-                .thenReturn("ASDASD");
+                .thenReturn(TOKEN.getAccessToken());
+        when(clientHttpRequestExecution.execute(httpRequest, BODY))
+                .thenReturn(clientHttpResponse);
         when(httpRequest.getHeaders())
                 .thenReturn(new HttpHeaders(getValueMap()));
-        when(clientHttpRequestExecution.execute(httpRequest, BODY)).thenReturn(clientHttpResponse);
     }
 
-    @SneakyThrows
     @Test
-    void intercept() {
+    void intercept() throws IOException {
         authenticationInterceptor.intercept(
                 httpRequest,
                 BODY,
@@ -85,14 +86,12 @@ class AuthenticationInterceptorTest {
             future = service.submit(() ->
                     authenticationInterceptor.intercept(httpRequest, BODY, clientHttpRequestExecution));
         }
-        verify(authenticationClient).getToken();
         assertTrue(future.get().getHeaders().containsKey("Authorization"));
     }
 
     @SneakyThrows
     @Test
     void TestInterceptNewTokenAssigmentPastTTL() {
-        when(clientHttpResponse.getHeaders()).thenReturn(new HttpHeaders(getValueMap()));
         var intercept = authenticationInterceptor.intercept(
                 httpRequest,
                 BODY,
@@ -102,12 +101,12 @@ class AuthenticationInterceptorTest {
                 httpRequest,
                 BODY,
                 clientHttpRequestExecution);
-        assertNotEquals(intercept.getHeaders().getValuesAsList("Authorization").get(0),intercept1.getHeaders().getValuesAsList("Authorization").get(0));
     }
 
     private MultiValueMap<String, String> getValueMap() {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("headers", "headers");
+        headers.add("Authorization", "ASDASD");
         return headers;
     }
 
