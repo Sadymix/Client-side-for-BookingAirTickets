@@ -55,8 +55,6 @@ class AuthenticationInterceptorTest {
     void setUp() {
         new Random().nextBytes(BODY);
         ReflectionTestUtils.setField(accessTokenSupplier, "ttl", 3600);
-        when(authenticationClient.getToken())
-                .thenReturn(TOKEN);
         when(accessTokenSupplier.supplyToken())
                 .thenReturn(TOKEN.getAccessToken());
         when(clientHttpRequestExecution.execute(httpRequest, BODY))
@@ -73,7 +71,6 @@ class AuthenticationInterceptorTest {
                 clientHttpRequestExecution);
         verify(clientHttpRequestExecution).execute(httpRequest, BODY);
         verify(accessTokenSupplier).supplyToken();
-        verify(authenticationClient).getToken();
     }
 
     @SneakyThrows
@@ -108,6 +105,6 @@ class AuthenticationInterceptorTest {
         headers.add("headers", "headers");
         headers.add("Authorization", "ASDASD");
         return headers;
-    }
 
+    }
 }
