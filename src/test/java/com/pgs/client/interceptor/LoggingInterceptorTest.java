@@ -96,5 +96,4 @@ class LoggingInterceptorTest {
         headers.add("headers", "headers");
         return headers;
     }
-
 }
