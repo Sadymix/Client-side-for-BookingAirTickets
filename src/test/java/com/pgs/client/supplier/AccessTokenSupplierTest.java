@@ -49,18 +49,17 @@ class AccessTokenSupplierTest {
     void testInterceptNewTokenAssigmentPastTTL() {
         var duration1 = Duration.ofSeconds(0);
         String accessTokenString1 = "";
+        when(authenticationClient.getToken())
+                .thenReturn(TOKEN1).thenReturn(TOKEN2);
         if (duration1 == Duration.ofSeconds(0)) {
             ReflectionTestUtils.setField(accessTokenSupplier, "ttl", duration1);
-            when(authenticationClient.getToken())
-                    .thenReturn(TOKEN1);
+
             accessTokenString1 = accessTokenSupplier.supplyToken();
         }
         String accessTokenString2 = "";
         var duration2 = Duration.ofSeconds(3600);
         if (duration2 == Duration.ofSeconds(3600)) {
             ReflectionTestUtils.setField(accessTokenSupplier, "ttl", duration2);
-            when(authenticationClient.getToken())
-                    .thenReturn(TOKEN2);
             accessTokenString2 = accessTokenSupplier.supplyToken();
         }
         assertNotEquals(accessTokenString2, accessTokenString1);
