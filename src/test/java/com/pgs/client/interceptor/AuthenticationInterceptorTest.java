@@ -18,7 +18,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,8 +62,9 @@ class AuthenticationInterceptorTest {
                 .thenReturn(new HttpHeaders(getValueMap()));
     }
 
+    @SneakyThrows
     @Test
-    void intercept() throws IOException {
+    void intercept() {
         authenticationInterceptor.intercept(
                 httpRequest,
                 BODY,
