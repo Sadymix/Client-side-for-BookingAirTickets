@@ -18,7 +18,9 @@ logging:
         web:
           client:
             RestTemplate: DEBUG
+security:
+  token:
+    ttl: PT1H
 spring:
-
   main:
     web-application-type: none

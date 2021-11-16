@@ -1,7 +1,6 @@
 package com.pgs.client.component;
 
 import com.pgs.client.dto.UserDto;
-import com.pgs.client.service.AuthenticationClient;
 import com.pgs.client.service.UserClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Client {
 
-    private final AuthenticationClient authenticationClient;
     private final UserClient userClient;
 
     public static String TOKEN;
@@ -33,11 +31,8 @@ public class Client {
 
     @PostConstruct
     public void postConstruct() {
-        var token = authenticationClient.getToken();
-        log.info("Token: {}", token);
-        TOKEN = token.getAccessToken();
         var singleUser = userClient.getSingleUser(1L);
-        log.info("Single User: {}" , singleUser);
+        log.info("Single User: {}", singleUser);
         var addUser = userClient.addUser(userDto);
         log.info("Added User: {}", addUser);
         var deactivateUser = userClient.deactivateUser(1L);

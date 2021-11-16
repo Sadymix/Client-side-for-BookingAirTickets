@@ -1,4 +1,4 @@
-package com.pgs.client.service;
+package com.pgs.client.authentication;
 
 import com.pgs.client.dto.Token;
 import lombok.RequiredArgsConstructor;
@@ -27,18 +27,21 @@ public class AuthenticationClient {
     private String tokenUrl;
 
     public Token getToken() {
-        MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-        requestBody.add("grant_type", grantType);
-        requestBody.add("username", username);
-        requestBody.add("password", password);
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        var request = new HttpEntity<>(requestBody, headers);
+        var request = new HttpEntity<>(setUpRequestBody(), headers);
         return authRestTemplate.postForObject(
                 tokenUrl,
                 request,
                 Token.class);
+    }
+
+    private MultiValueMap<String, String> setUpRequestBody() {
+        MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("grant_type", grantType);
+        requestBody.add("username", username);
+        requestBody.add("password", password);
+        return requestBody;
     }
 }

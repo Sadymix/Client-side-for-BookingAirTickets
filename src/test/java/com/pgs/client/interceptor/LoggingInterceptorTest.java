@@ -34,7 +34,7 @@ class LoggingInterceptorTest {
     @Mock
     private HttpRequest httpRequest;
     @Mock
-    private ClientHttpRequestExecution clientHttpRequestExecution ;
+    private ClientHttpRequestExecution clientHttpRequestExecution;
     @Mock
     private ClientHttpResponse clientHttpResponse;
 
@@ -96,5 +96,4 @@ class LoggingInterceptorTest {
         headers.add("headers", "headers");
         return headers;
     }
-
 }

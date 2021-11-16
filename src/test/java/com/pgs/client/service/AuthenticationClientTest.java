@@ -1,5 +1,6 @@
 package com.pgs.client.service;
 
+import com.pgs.client.authentication.AuthenticationClient;
 import com.pgs.client.dto.Token;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,10 +30,9 @@ class AuthenticationClientTest {
 
     private static final String USERNAME = "user";
     private static final String PASSWORD = "user";
-    private static final String GRANT_TYPE = "password";
     private static final String TOKEN_URL = "http://localhost:8080/oauth/token";
 
-    private static final Token TOKEN_DTO = Token.builder()
+    private static final Token TOKEN = Token.builder()
             .accessToken("asd")
             .tokenType("dsa")
             .refreshToken("sda")
@@ -42,32 +42,26 @@ class AuthenticationClientTest {
 
     @BeforeEach
     void testGetTokenSetUp() {
-        setAuthenticationClientFields();
+        ReflectionTestUtils.setField(authenticationClient, "username", USERNAME);
+        ReflectionTestUtils.setField(authenticationClient, "password", PASSWORD);
+        ReflectionTestUtils.setField(authenticationClient, "grantType", "password");
+        ReflectionTestUtils.setField(authenticationClient, "tokenUrl", TOKEN_URL);
         when(authRestTemplate.postForObject(TOKEN_URL, setUpRequest(), Token.class))
-                .thenReturn(TOKEN_DTO);
+                .thenReturn(TOKEN);
     }
 
     @Test
     void testGetToken() {
+        when(authRestTemplate.postForObject(TOKEN_URL, setUpRequest(), Token.class))
+                .thenReturn(TOKEN);
         var token = authenticationClient.getToken();
         verify(authRestTemplate).postForObject(TOKEN_URL, setUpRequest(), Token.class);
-        assertEquals(TOKEN_DTO.getAccessToken(), token.getAccessToken());
-        assertEquals(TOKEN_DTO.getTokenType(), token.getTokenType());
-        assertEquals(TOKEN_DTO.getRefreshToken(), token.getRefreshToken());
-        assertEquals(TOKEN_DTO.getExpiresIn(), token.getExpiresIn());
-        assertEquals(TOKEN_DTO.getScope(), token.getScope());
-    }
-
-    private void setAuthenticationClientFields() {
-        ReflectionTestUtils.setField(authenticationClient, "username", USERNAME);
-        ReflectionTestUtils.setField(authenticationClient, "password", PASSWORD);
-        ReflectionTestUtils.setField(authenticationClient, "grantType", GRANT_TYPE);
-        ReflectionTestUtils.setField(authenticationClient, "tokenUrl", TOKEN_URL);
+        assertEquals(TOKEN, token);
     }
 
     private HttpEntity<MultiValueMap<String, String>> setUpRequest() {
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-        requestBody.add("grant_type", GRANT_TYPE);
+        requestBody.add("grant_type", "password");
         requestBody.add("username", USERNAME);
         requestBody.add("password", PASSWORD);
         HttpHeaders headers = new HttpHeaders();
