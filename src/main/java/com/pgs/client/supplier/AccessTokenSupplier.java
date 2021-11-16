@@ -28,7 +28,7 @@ public class AccessTokenSupplier {
         return accessToken;
     }
 
-    private boolean isAccessTokenNeeded(){
+    private boolean isAccessTokenNeeded() {
         return stopWatch.getTime(TimeUnit.SECONDS) >= ttl.toSeconds()
                 || accessToken == null
                 || !stopWatch.isStarted();
