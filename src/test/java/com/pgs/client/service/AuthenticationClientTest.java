@@ -1,5 +1,6 @@
 package com.pgs.client.service;
 
+import com.pgs.client.authentication.AuthenticationClient;
 import com.pgs.client.dto.Token;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

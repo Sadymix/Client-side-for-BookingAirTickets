@@ -1,6 +1,5 @@
-package com.pgs.client.interceptor;
+package com.pgs.client.authentication;
 
-import com.pgs.client.supplier.AccessTokenSupplier;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpRequest;

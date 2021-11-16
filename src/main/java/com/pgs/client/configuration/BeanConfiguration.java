@@ -1,6 +1,6 @@
 package com.pgs.client.configuration;
 
-import com.pgs.client.interceptor.AuthenticationInterceptor;
+import com.pgs.client.authentication.AuthenticationInterceptor;
 import com.pgs.client.interceptor.LoggingInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

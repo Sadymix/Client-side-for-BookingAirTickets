@@ -1,4 +1,4 @@
-package com.pgs.client.service;
+package com.pgs.client.authentication;
 
 import com.pgs.client.dto.Token;
 import lombok.RequiredArgsConstructor;

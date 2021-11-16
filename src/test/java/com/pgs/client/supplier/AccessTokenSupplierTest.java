@@ -1,9 +1,11 @@
 package com.pgs.client.supplier;
 
+import com.pgs.client.authentication.AccessTokenSupplier;
+import com.pgs.client.authentication.AuthenticationClient;
 import com.pgs.client.dto.Token;
-import com.pgs.client.service.AuthenticationClient;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.time.StopWatch;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,8 +21,7 @@ import java.util.concurrent.Executors;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AccessTokenSupplierTest {
@@ -41,9 +42,13 @@ class AccessTokenSupplierTest {
             .refreshToken("refresh4321")
             .build();
 
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(accessTokenSupplier, "ttl", Duration.ofHours(1));
+    }
+
     @Test
     void testSupplyToken() {
-        ReflectionTestUtils.setField(accessTokenSupplier, "ttl", Duration.ofHours(1));
         when(authenticationClient.getToken())
                 .thenReturn(TOKEN1);
         var accessTokenString = accessTokenSupplier.supplyToken();
@@ -55,36 +60,24 @@ class AccessTokenSupplierTest {
     @SneakyThrows
     @Test
     void testNewTokenSupplyPastTTL() {
-        String accessTokenString1 = "";
-        String accessTokenString2 = "";
+        ReflectionTestUtils.setField(accessTokenSupplier, "stopWatch", stopWatch);
         when(authenticationClient.getToken())
                 .thenReturn(TOKEN1).thenReturn(TOKEN2);
-        stopWatch.start();
-        var stopWatchTime = stopWatch.getTime(SECONDS);
-        if (stopWatchTime>= 0l && stopWatchTime < 3600l) {
-            ReflectionTestUtils.setField(accessTokenSupplier, "ttl", Duration.ofSeconds(stopWatchTime));
-            accessTokenString1 = accessTokenSupplier.supplyToken();
-        }
-        synchronized (stopWatch) {
-            stopWatch.wait(1000);
-            stopWatchTime = stopWatch.getTime(SECONDS);
-            if (stopWatchTime >= 1l) {
-                ReflectionTestUtils.setField(accessTokenSupplier, "ttl", Duration.ofHours(1));
-                accessTokenString2 = accessTokenSupplier.supplyToken();
-            }
-        }
+        when(stopWatch.getTime(SECONDS)).thenReturn(0L).thenReturn(3600L);
+        var accessTokenString1 = accessTokenSupplier.supplyToken();
+        var accessTokenString2 = accessTokenSupplier.supplyToken();
+
         assertNotEquals(accessTokenString2, accessTokenString1);
     }
 
     @SneakyThrows
     @Test
-    void TestSupplyToken10Threads() {
+    void testSupplyToken10Threads() {
         int numberOfThreads = 10;
         ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         CompletableFuture<String> future = null;
         when(authenticationClient.getToken())
                 .thenReturn(TOKEN1);
-        ReflectionTestUtils.setField(accessTokenSupplier, "ttl", Duration.ofHours(1));
         for (int i = 0; i < numberOfThreads; i++) {
             service.submit(() ->
                     accessTokenSupplier.supplyToken());

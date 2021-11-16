@@ -1,6 +1,5 @@
-package com.pgs.client.supplier;
+package com.pgs.client.authentication;
 
-import com.pgs.client.service.AuthenticationClient;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Value;

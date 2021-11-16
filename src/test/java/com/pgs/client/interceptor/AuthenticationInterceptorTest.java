@@ -1,6 +1,7 @@
 package com.pgs.client.interceptor;
 
-import com.pgs.client.supplier.AccessTokenSupplier;
+import com.pgs.client.authentication.AuthenticationInterceptor;
+import com.pgs.client.authentication.AccessTokenSupplier;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
