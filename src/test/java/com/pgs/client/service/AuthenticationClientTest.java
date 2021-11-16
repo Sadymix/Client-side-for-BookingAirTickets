@@ -55,11 +55,7 @@ class AuthenticationClientTest {
                 .thenReturn(TOKEN);
         var token = authenticationClient.getToken();
         verify(authRestTemplate).postForObject(TOKEN_URL, setUpRequest(), Token.class);
-        assertEquals(TOKEN.getAccessToken(), token.getAccessToken());
-        assertEquals(TOKEN.getTokenType(), token.getTokenType());
-        assertEquals(TOKEN.getRefreshToken(), token.getRefreshToken());
-        assertEquals(TOKEN.getExpiresIn(), token.getExpiresIn());
-        assertEquals(TOKEN.getScope(), token.getScope());
+        assertEquals(TOKEN, token);
     }
 
     private HttpEntity<MultiValueMap<String, String>> setUpRequest() {
