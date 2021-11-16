@@ -38,6 +38,7 @@ class AccessTokenSupplierTest {
 
     @Test
     void testSupplyToken() {
+        ReflectionTestUtils.setField(accessTokenSupplier, "ttl", Duration.ofSeconds(3600));
         when(authenticationClient.getToken())
                 .thenReturn(TOKEN1);
         var accessTokenString = accessTokenSupplier.supplyToken();
