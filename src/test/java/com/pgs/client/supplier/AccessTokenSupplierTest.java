@@ -11,11 +11,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AccessTokenSupplierTest {
@@ -48,20 +50,38 @@ class AccessTokenSupplierTest {
     @Test
     void testInterceptNewTokenAssigmentPastTTL() {
         var duration1 = Duration.ofSeconds(0);
+        var duration2 = Duration.ofSeconds(3600);
         String accessTokenString1 = "";
+        String accessTokenString2 = "";
         when(authenticationClient.getToken())
                 .thenReturn(TOKEN1).thenReturn(TOKEN2);
         if (duration1 == Duration.ofSeconds(0)) {
             ReflectionTestUtils.setField(accessTokenSupplier, "ttl", duration1);
-
             accessTokenString1 = accessTokenSupplier.supplyToken();
         }
-        String accessTokenString2 = "";
-        var duration2 = Duration.ofSeconds(3600);
         if (duration2 == Duration.ofSeconds(3600)) {
             ReflectionTestUtils.setField(accessTokenSupplier, "ttl", duration2);
             accessTokenString2 = accessTokenSupplier.supplyToken();
         }
         assertNotEquals(accessTokenString2, accessTokenString1);
+    }
+
+    @SneakyThrows
+    @Test
+    void TestIntercept10Threads() {
+        int numberOfThreads = 10;
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CompletableFuture<String> future = null;
+        when(authenticationClient.getToken())
+                .thenReturn(TOKEN1);
+        ReflectionTestUtils.setField(accessTokenSupplier, "ttl", Duration.ofSeconds(3600));
+        for (int i = 0; i < numberOfThreads; i++) {
+            future = CompletableFuture.completedFuture(service.submit(() ->
+                    accessTokenSupplier.supplyToken()).get());
+            assertEquals(future.get(), TOKEN1.getAccessToken());
+        }
+        service.shutdown();
+        service.awaitTermination(5, SECONDS);
+        verify(authenticationClient).getToken();
     }
 }
