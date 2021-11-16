@@ -27,22 +27,21 @@ public class AuthenticationClient {
     private String tokenUrl;
 
     public Token getToken() {
-        MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-        setUpRequestBody(requestBody, grantType);
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        var request = new HttpEntity<>(requestBody, headers);
+        var request = new HttpEntity<>(setUpRequestBody(grantType), headers);
         return authRestTemplate.postForObject(
                 tokenUrl,
                 request,
                 Token.class);
     }
 
-    private void setUpRequestBody(MultiValueMap<String, String> requestBody, String grantType) {
+    private MultiValueMap<String, String> setUpRequestBody(String grantType) {
+        MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("grant_type", grantType);
         requestBody.add("username", username);
         requestBody.add("password", password);
+        return requestBody;
     }
 }
