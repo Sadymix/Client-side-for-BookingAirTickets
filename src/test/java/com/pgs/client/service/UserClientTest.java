@@ -96,16 +96,17 @@ class UserClientTest {
 
     @Test
     void testDeactivateUser() {
-        when(restTemplate.exchange(eq(URL+"/1/deactivate"), eq(HttpMethod.PUT),
+        when(restTemplate.exchange(eq(URL + "/1/deactivate"), eq(HttpMethod.PUT),
                 any(HttpEntity.class), eq(UserDto.class)))
                 .thenReturn(responseEntity);
         var userDto = userClient.deactivateUser(1L);
         verify(restTemplate).exchange(anyString(), any(HttpMethod.class), requestCaptor.capture(), any(Class.class));
         assertEquals(userDto.isEnabled(), USER_DTO.isEnabled());
     }
+
     @Test
     void testSetRoles() {
-        when(restTemplate.exchange(eq(URL+"/1/setRoles"), eq(HttpMethod.PUT),
+        when(restTemplate.exchange(eq(URL + "/1/setRoles"), eq(HttpMethod.PUT),
                 any(HttpEntity.class), eq(UserDto.class)))
                 .thenReturn(responseEntity);
         var userDto = userClient.setUserRoles(1L, List.of("ADMIN", "USER"));

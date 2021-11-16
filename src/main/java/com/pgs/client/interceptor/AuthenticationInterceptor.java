@@ -17,7 +17,7 @@ public class AuthenticationInterceptor implements ClientHttpRequestInterceptor {
 
     @Override
     @SneakyThrows
-    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution){
+    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) {
         request.getHeaders().setBearerAuth(accessTokenSupplier.supplyToken());
         return execution.execute(request, body);
     }

@@ -33,7 +33,7 @@ public class LoggingInterceptor implements ClientHttpRequestInterceptor {
     public ClientHttpResponse intercept(
             HttpRequest request,
             byte[] body,
-            ClientHttpRequestExecution execution){
+            ClientHttpRequestExecution execution) {
 
         var logRequestData = setUpLogRequestData(request, body);
         LogResponseData logResponseData = null;
@@ -46,7 +46,7 @@ public class LoggingInterceptor implements ClientHttpRequestInterceptor {
                 logResponseData = new LogResponseData(null, null, null);
             }
             log.info("""
-                            
+                                                        
                             REQUEST
                             URL: {}
                             Method: {}
@@ -61,6 +61,7 @@ public class LoggingInterceptor implements ClientHttpRequestInterceptor {
                     logResponseData.statusCode, logResponseData.headers, logResponseData.body);
         }
     }
+
     private LogRequestData setUpLogRequestData(HttpRequest request, byte[] body) {
         return new LogRequestData(request.getURI(), request.getMethod(), request.getHeaders(), new String(body));
     }

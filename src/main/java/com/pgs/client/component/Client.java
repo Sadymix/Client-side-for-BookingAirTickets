@@ -32,7 +32,7 @@ public class Client {
     @PostConstruct
     public void postConstruct() {
         var singleUser = userClient.getSingleUser(1L);
-        log.info("Single User: {}" , singleUser);
+        log.info("Single User: {}", singleUser);
         var addUser = userClient.addUser(userDto);
         log.info("Added User: {}", addUser);
         var deactivateUser = userClient.deactivateUser(1L);

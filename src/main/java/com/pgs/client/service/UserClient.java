@@ -43,11 +43,11 @@ public class UserClient {
     }
 
     public UserDto activateUser(Long id) {
-        return setUserEnabled(apiUsersUrl+"/"+id+"/activate");
+        return setUserEnabled(apiUsersUrl + "/" + id + "/activate");
     }
 
     public UserDto deactivateUser(Long id) {
-        return setUserEnabled(apiUsersUrl+"/"+id+"/deactivate");
+        return setUserEnabled(apiUsersUrl + "/" + id + "/deactivate");
     }
 
     public UserDto setUserRoles(Long id, List<String> roleList) {
