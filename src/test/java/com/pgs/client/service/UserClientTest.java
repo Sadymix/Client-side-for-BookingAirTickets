@@ -11,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -52,23 +51,18 @@ class UserClientTest {
     void setUp() {
         ReflectionTestUtils.setField(userClient, "apiUsersUrl", URL);
         Client.TOKEN = "qwerty";
-        when(responseEntity.getBody()).thenReturn(USER_DTO);
+//        when(responseEntity.getBody()).thenReturn(USER_DTO);
     }
 
     @Test
     void testGetSingleUser() {
-        when(restTemplate.exchange(eq(URL + "/1"), eq(HttpMethod.GET), any(HttpEntity.class), eq(UserDto.class)))
-                .thenReturn(responseEntity);
+        when(restTemplate.getForObject(eq(URL + "/1"), eq(UserDto.class)))
+                .thenReturn(USER_DTO);
 
-        userClient.getSingleUser(1L);
+        var user = userClient.getSingleUser(1L);
 
-        verify(restTemplate).exchange(anyString(), any(HttpMethod.class), requestCaptor.capture(), any(Class.class));
-        var request = requestCaptor.getValue();
-
-        assertThat(request).isNotNull();
-        assertThat(request.getHeaders().getValuesAsList(HttpHeaders.AUTHORIZATION))
-                .hasSize(1)
-                .contains("Bearer " + Client.TOKEN);
+        verify(restTemplate).getForObject(anyString(), any(Class.class));
+        assertEquals(user, USER_DTO);
     }
 
     @Test
