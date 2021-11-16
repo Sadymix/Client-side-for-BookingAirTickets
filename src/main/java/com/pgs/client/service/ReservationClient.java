@@ -24,19 +24,16 @@ public class ReservationClient {
     private static HttpHeaders headers = getHeaders();
 
     public ReservationDto getReservationWithPassengersAndFlight(Long id) {
-        var request = new HttpEntity<>(headers);
         return restTemplate.getForObject(
                 apiReservationsUrl + "/" + id,
-                ReservationDto.class,
-                request);
+                ReservationDto.class);
     }
 
     public List<ReservationDto> getReservationsByFlight(Long id) {
-        var request = new HttpEntity<>(headers);
+
         return restTemplate.getForObject(
                 apiReservationsUrl + "/flights/" + id,
-                ReservationDtoList.class,
-                request).getReservations();
+                ReservationDtoList.class).getReservations();
     }
 
     public List<ReservationDto> getReservationsForCurrentUser() {
@@ -46,11 +43,10 @@ public class ReservationClient {
     }
 
     public List<ReservationDto> getReservationsByUser(Long id) {
-        var request = new HttpEntity<>(headers);
+
         return restTemplate.getForObject(
                 apiReservationsUrl + "/users/" + id,
-                ReservationDtoList.class,
-                request).getReservations();
+                ReservationDtoList.class).getReservations();
     }
 
     public ReservationDto addReservation(ReservationDto reservationDto) {

@@ -4,7 +4,6 @@ import com.pgs.client.component.Client;
 import com.pgs.client.dto.WeatherDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -22,11 +21,9 @@ public class WeatherClient {
     private String apiWeatherUrl;
 
     public WeatherDto getWeatherByCity() {
-        var request= new HttpEntity<>(getHeaders());
         return restTemplate.getForObject(
                 apiWeatherUrl+"/",
-                WeatherDto.class,
-                request);
+                WeatherDto.class);
     }
 
     private static HttpHeaders getHeaders() {

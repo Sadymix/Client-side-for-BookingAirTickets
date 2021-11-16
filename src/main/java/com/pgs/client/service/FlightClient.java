@@ -25,18 +25,15 @@ public class FlightClient {
     private static HttpHeaders headers = getHeaders();
 
     public List<FlightDto> getFlights() {
-        var request = new HttpEntity<>(headers);
-        return restTemplate.getForObject(apiUsersUrl,
-                FlightDtoList.class,
-                request).getFlights();
+        return restTemplate.getForObject(
+                apiUsersUrl,
+                FlightDtoList.class).getFlights();
     }
 
     public FlightDto getFlight(Long id) {
-        var request = new HttpEntity<>(headers);
         return restTemplate.getForObject(
                 apiUsersUrl+"/"+id,
-                FlightDto.class,
-                request);
+                FlightDto.class);
     }
 
     public FlightDto addFlight(FlightDto flightDto) {
