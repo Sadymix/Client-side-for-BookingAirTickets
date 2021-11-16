@@ -29,7 +29,6 @@ class AuthenticationClientTest {
 
     private static final String USERNAME = "user";
     private static final String PASSWORD = "user";
-    private static final String GRANT_TYPE = "password";
     private static final String TOKEN_URL = "http://localhost:8080/oauth/token";
 
     private static final Token TOKEN = Token.builder()
@@ -44,18 +43,18 @@ class AuthenticationClientTest {
     void testGetTokenSetUp() {
         ReflectionTestUtils.setField(authenticationClient, "username", USERNAME);
         ReflectionTestUtils.setField(authenticationClient, "password", PASSWORD);
-        ReflectionTestUtils.setField(authenticationClient, "grantType", GRANT_TYPE);
+        ReflectionTestUtils.setField(authenticationClient, "grantType", "password");
         ReflectionTestUtils.setField(authenticationClient, "tokenUrl", TOKEN_URL);
-        when(authRestTemplate.postForObject(TOKEN_URL, setUpRequest(GRANT_TYPE), Token.class))
+        when(authRestTemplate.postForObject(TOKEN_URL, setUpRequest(), Token.class))
                 .thenReturn(TOKEN);
     }
 
     @Test
     void testGetToken() {
-        when(authRestTemplate.postForObject(TOKEN_URL, setUpRequest(GRANT_TYPE), Token.class))
+        when(authRestTemplate.postForObject(TOKEN_URL, setUpRequest(), Token.class))
                 .thenReturn(TOKEN);
         var token = authenticationClient.getToken();
-        verify(authRestTemplate).postForObject(TOKEN_URL, setUpRequest(GRANT_TYPE), Token.class);
+        verify(authRestTemplate).postForObject(TOKEN_URL, setUpRequest(), Token.class);
         assertEquals(TOKEN.getAccessToken(), token.getAccessToken());
         assertEquals(TOKEN.getTokenType(), token.getTokenType());
         assertEquals(TOKEN.getRefreshToken(), token.getRefreshToken());
@@ -63,9 +62,9 @@ class AuthenticationClientTest {
         assertEquals(TOKEN.getScope(), token.getScope());
     }
 
-    private HttpEntity<MultiValueMap<String, String>> setUpRequest(String grantType) {
+    private HttpEntity<MultiValueMap<String, String>> setUpRequest() {
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-        requestBody.add("grant_type", grantType);
+        requestBody.add("grant_type", "password");
         requestBody.add("username", USERNAME);
         requestBody.add("password", PASSWORD);
         HttpHeaders headers = new HttpHeaders();
