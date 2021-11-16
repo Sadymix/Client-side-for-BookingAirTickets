@@ -1,6 +1,5 @@
 package com.pgs.client.interceptor;
 
-import com.pgs.client.dto.Token;
 import com.pgs.client.supplier.AccessTokenSupplier;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,13 +9,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.mock.http.client.MockClientHttpRequest;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.util.Random;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,37 +24,34 @@ class AuthenticationInterceptorTest {
     @Mock
     private AccessTokenSupplier accessTokenSupplier;
     @Mock
-    private HttpRequest httpRequest;
-    @Mock
     private ClientHttpRequestExecution clientHttpRequestExecution;
     @InjectMocks
     private AuthenticationInterceptor authenticationInterceptor;
 
-    private static byte[] BODY = new byte[20];
+    private MockClientHttpRequest mockClientHttpRequest;
+    private static byte[] BODY = null;
 
-    private static final Token TOKEN = Token.builder()
-            .accessToken("ASDASD")
-            .build();
+    private static final String TOKEN = "ASDF";
 
     @SneakyThrows
     @BeforeEach
     void setUp() {
-        new Random().nextBytes(BODY);
         when(accessTokenSupplier.supplyToken())
-                .thenReturn(TOKEN.getAccessToken());
-        when(httpRequest.getHeaders())
+                .thenReturn(TOKEN);
+        when(mockClientHttpRequest.getHeaders())
                 .thenReturn(new HttpHeaders(getValueMap()));
     }
 
     @SneakyThrows
     @Test
     void testIntercept() {
-        authenticationInterceptor.intercept(
-                httpRequest,
+       var response=  authenticationInterceptor.intercept(
+                mockClientHttpRequest,
                 BODY,
                 clientHttpRequestExecution);
-        verify(clientHttpRequestExecution).execute(httpRequest, BODY);
+        verify(clientHttpRequestExecution).execute(mockClientHttpRequest, BODY);
         verify(accessTokenSupplier).supplyToken();
+        assertTrue(response.getHeaders().containsKey("Authorization"));
     }
 
     private MultiValueMap<String, String> getValueMap() {
