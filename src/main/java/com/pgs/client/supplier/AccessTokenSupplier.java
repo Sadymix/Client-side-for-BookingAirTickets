@@ -14,23 +14,23 @@ import java.util.concurrent.TimeUnit;
 public class AccessTokenSupplier {
 
     private final AuthenticationClient authenticationClient;
-    private String ACCESS_TOKEN;
+    private String accessToken;
     private StopWatch stopWatch = StopWatch.createStarted();
     @Value("${security.token.ttl}")
     private Duration ttl;
 
     public synchronized String supplyToken() {
         if (isAccessTokenNeeded()) {
-            ACCESS_TOKEN = authenticationClient.getToken().getAccessToken();
+            accessToken = authenticationClient.getToken().getAccessToken();
             stopWatch.reset();
             stopWatch.start();
         }
-        return ACCESS_TOKEN;
+        return accessToken;
     }
 
     private boolean isAccessTokenNeeded(){
         return stopWatch.getTime(TimeUnit.SECONDS) >= ttl.toSeconds()
-                || ACCESS_TOKEN == null
+                || accessToken == null
                 || !stopWatch.isStarted();
     }
 }
