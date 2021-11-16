@@ -52,9 +52,7 @@ class UserClientTest {
     void testGetSingleUser() {
         when(restTemplate.getForObject(eq(URL + "/1"), eq(UserDto.class)))
                 .thenReturn(USER_DTO);
-
         var user = userClient.getSingleUser(1L);
-
         verify(restTemplate).getForObject(anyString(), any(Class.class));
         assertEquals(user, USER_DTO);
     }
@@ -85,7 +83,6 @@ class UserClientTest {
                 .thenReturn(USER_DTO);
         var user = userClient.deactivateUser(1L);
         verify(restTemplate).postForObject(anyString(), any(HttpEntity.class), any(Class.class));
-
         assertEquals(user, USER_DTO);
     }
 
