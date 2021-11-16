@@ -30,14 +30,14 @@ public class AuthenticationClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        var request = new HttpEntity<>(setUpRequestBody(grantType), headers);
+        var request = new HttpEntity<>(setUpRequestBody(), headers);
         return authRestTemplate.postForObject(
                 tokenUrl,
                 request,
                 Token.class);
     }
 
-    private MultiValueMap<String, String> setUpRequestBody(String grantType) {
+    private MultiValueMap<String, String> setUpRequestBody() {
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("grant_type", grantType);
         requestBody.add("username", username);
