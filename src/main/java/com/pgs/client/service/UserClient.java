@@ -1,12 +1,10 @@
 package com.pgs.client.service;
 
-import com.pgs.client.component.Client;
 import com.pgs.client.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -21,25 +19,20 @@ public class UserClient {
 
     @Value("${app.url.user}")
     private String apiUsersUrl;
+    private static HttpHeaders headers = getHeaders();
 
     public UserDto getSingleUser(Long id) {
-        HttpHeaders headers = getHeaders();
-        var request = new HttpEntity<>(headers);
-        return restTemplate.exchange(
+        return restTemplate.getForObject(
                 apiUsersUrl + "/" + id,
-                HttpMethod.GET,
-                request,
-                UserDto.class).getBody();
+                UserDto.class);
     }
 
     public UserDto addUser(UserDto userDto) {
-        HttpHeaders headers = getHeaders();
         var request = new HttpEntity<>(userDto, headers);
-        return restTemplate.exchange(
+        return restTemplate.postForObject(
                 apiUsersUrl,
-                HttpMethod.POST,
                 request,
-                UserDto.class).getBody();
+                UserDto.class);
     }
 
     public UserDto activateUser(Long id) {
@@ -51,30 +44,25 @@ public class UserClient {
     }
 
     public UserDto setUserRoles(Long id, List<String> roleList) {
-        HttpHeaders headers = getHeaders();
         var request = new HttpEntity<>(roleList, headers);
-        return restTemplate.exchange(
+        return restTemplate.postForObject(
                 apiUsersUrl + "/" + id + "/setRoles",
-                HttpMethod.PUT,
                 request,
-                UserDto.class).getBody();
-    }
-
-    private HttpHeaders getHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(Client.TOKEN);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        return headers;
+                UserDto.class);
     }
 
     private UserDto setUserEnabled(String url) {
-        HttpHeaders headers = getHeaders();
         var request = new HttpEntity<>(headers);
-        return restTemplate.exchange(
+        return restTemplate.postForObject(
                 url,
-                HttpMethod.PUT,
                 request,
-                UserDto.class).getBody();
+                UserDto.class);
+    }
+
+    private static HttpHeaders getHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        return headers;
     }
 }
