@@ -48,7 +48,7 @@ class PassengerClientTest {
     }
     
     @Test
-    void getPassengers() {
+    void testGetPassengers() {
         when(restTemplate.exchange(eq(URL), eq(HttpMethod.GET),nullable(HttpEntity.class),
                 any(ParameterizedTypeReference.class)))
                 .thenReturn(responseEntityList);
@@ -59,7 +59,7 @@ class PassengerClientTest {
     }
 
     @Test
-    void getSinglePassenger() {
+    void testGetSinglePassenger() {
         when(restTemplate.getForObject(
                 eq(URL + "/" + 1),
                 eq(PassengerDto.class)))
@@ -70,7 +70,7 @@ class PassengerClientTest {
     }
 
     @Test
-    void addPassenger() {
+    void testAddPassenger() {
         when(restTemplate.postForObject(
                 eq(URL),
                 any(HttpEntity.class),
@@ -82,7 +82,7 @@ class PassengerClientTest {
     }
 
     @Test
-    void editPassenger() {
+    void testEditPassenger() {
         when(restTemplate.exchange(
                 eq(URL+"/"+1),
                 eq(HttpMethod.PUT),
