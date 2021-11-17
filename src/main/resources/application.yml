@@ -7,17 +7,15 @@ app:
     base: http://localhost:8080
     token: ${app.url.base}/oauth/token
     api: ${app.url.base}/api
+    airports: ${app.url.api}/airports
+    flights: ${app.url.api}/flights
+    passengers: ${app.url.api}/passengers
+    reservations: ${app.url.api}/reservations
     user: ${app.url.api}/users
+    weather: ${app.url.api}/weather
   client:
     clientId: ClientId
     secret: secret
-logging:
-  level:
-    org:
-      springframework:
-        web:
-          client:
-            RestTemplate: DEBUG
 security:
   token:
     ttl: PT1H
