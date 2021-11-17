@@ -1,20 +1,17 @@
 package com.pgs.client.service;
 
-import com.pgs.client.component.Client;
 import com.pgs.client.dto.PassengerDto;
 import com.pgs.client.dto.ReservationDto;
-import com.pgs.client.dto.UserDto;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,12 +25,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ReservationClientTest {
 
-    @Captor
-    private ArgumentCaptor<HttpEntity<UserDto>> requestCaptor;
-
+    @Mock
+    private ParameterizedTypeReference<List<ReservationDto>> responseType;
+    @Mock
+    private ResponseEntity<ReservationDto> responseEntity;
+    @Mock
+    private ResponseEntity<List<ReservationDto>> responseEntityList;
     @Mock
     private RestTemplate restTemplate;
-
     @InjectMocks
     private ReservationClient reservationClient;
 
@@ -47,54 +46,102 @@ class ReservationClientTest {
             .passengers(List.of(PASSENGER))
             .userId(12L)
             .build();
+    private static final ReservationDto RESERVATION_CANCELED = ReservationDto.builder()
+            .status(ReservationDto.ReservationStatus.CANCELED)
+            .build();
+    private static final ReservationDto RESERVATION_REALIZED = ReservationDto.builder()
+            .status(ReservationDto.ReservationStatus.REALIZED)
+            .build();
 
     @BeforeEach
-    void setUp (){
+    void setUp() {
         ReflectionTestUtils.setField(reservationClient, "apiReservationsUrl", URL);
-        Client.TOKEN = "qwerty";
     }
 
     @Test
-    void getReservationWithPassengersAndFlight() {
-        when(restTemplate.getForObject(eq(URL), eq(ReservationDto.class), any(HttpEntity.class)))
+    void testGetReservationWithPassengersAndFlight() {
+        when(restTemplate.getForObject(eq(URL + "/12"), eq(ReservationDto.class)))
                 .thenReturn(RESERVATION);
-
-        reservationClient.getReservationWithPassengersAndFlight(1L);
-        verify(restTemplate).getForObject(anyString(), any(Class.class), requestCaptor.capture());
-        var request = requestCaptor.getValue();
-        assertThat(request).isNotNull();
-        Assertions.assertThat(request.getHeaders().getValuesAsList(HttpHeaders.AUTHORIZATION))
-                .hasSize(1)
-                .contains("Bearer " + Client.TOKEN);
-        assertThat(request.getBody()).isEqualTo(RESERVATION);
-
+        var reservation = reservationClient.getReservationWithPassengersAndFlight(12L);
+        verify(restTemplate).getForObject(anyString(), any(Class.class));
+        assertThat(reservation).isNotNull();
+        assertThat(reservation).isEqualTo(RESERVATION);
     }
 
     @Test
-    void getReservationsByFlight() {
+    void testGetReservationsByFlight() {
+        when(restTemplate.exchange(
+                eq(URL + "/flights/23"),
+                eq(HttpMethod.GET),
+                nullable(HttpEntity.class),
+                any(ParameterizedTypeReference.class)))
+                .thenReturn(responseEntityList);
+        when(responseEntityList.getBody()).thenReturn(List.of(RESERVATION));
+        var reservations = reservationClient.getReservationsByFlight(23L);
+        assertThat(reservations).isNotNull();
+        assertThat(reservations).isEqualTo(List.of(RESERVATION));
     }
 
     @Test
-    void getReservationsForCurrentUser() {
+    void testGetReservationsForCurrentUser() {
+        when(restTemplate.exchange(
+                eq(URL + "/users"),
+                eq(HttpMethod.GET),
+                nullable(HttpEntity.class),
+                any(ParameterizedTypeReference.class)))
+                .thenReturn(responseEntityList);
+        when(responseEntityList.getBody()).thenReturn(List.of(RESERVATION));
+        var reservations = reservationClient.getReservationsForCurrentUser();
+        assertThat(reservations).isNotNull();
+        assertThat(reservations).isEqualTo(List.of(RESERVATION));
     }
 
     @Test
-    void getReservationsByUser() {
+    void testGetReservationsByUser() {
+        when(restTemplate.exchange(
+                eq(URL + "/users/" + 1),
+                eq(HttpMethod.GET),
+                nullable(HttpEntity.class),
+                any(ParameterizedTypeReference.class)))
+                .thenReturn(responseEntityList);
+        when(responseEntityList.getBody()).thenReturn(List.of(RESERVATION));
+        var reservations = reservationClient.getReservationsByUser(1L);
+        assertThat(reservations).isNotNull();
+        assertThat(reservations).isEqualTo(List.of(RESERVATION));
     }
 
     @Test
-    void addReservation() {
+    void testAddReservation() {
+        when(restTemplate.postForObject(eq(URL), any(HttpEntity.class), eq(ReservationDto.class)))
+                .thenReturn(RESERVATION);
+        var reservation = reservationClient.addReservation(RESERVATION);
+        verify(restTemplate).postForObject(anyString(), any(HttpEntity.class), any(Class.class));
+        assertThat(reservation).isEqualTo(RESERVATION);
     }
 
     @Test
-    void deleteReservation() {
+    void testCancelReservation() {
+        when(restTemplate.exchange(eq(URL + "/" + 1 + "/canceled"), eq(HttpMethod.PUT),
+                any(HttpEntity.class), eq(ReservationDto.class)))
+                .thenReturn(responseEntity);
+        when(responseEntity.getBody()).thenReturn(RESERVATION_CANCELED);
+        var reservation = reservationClient.cancelReservation(1L);
+        assertThat(reservation.getStatus()).isEqualTo(RESERVATION_CANCELED.getStatus());
     }
 
     @Test
-    void cancelReservation() {
+    void testRealizedReservation() {
+        when(restTemplate.exchange(eq(URL + "/" + 1 + "/realized"), eq(HttpMethod.PUT),
+                any(HttpEntity.class), eq(ReservationDto.class)))
+                .thenReturn(responseEntity);
+        when(responseEntity.getBody()).thenReturn(RESERVATION_REALIZED);
+        var reservation = reservationClient.realizedReservation(1L);
+        assertThat(reservation.getStatus()).isEqualTo(RESERVATION_REALIZED.getStatus());
     }
 
     @Test
-    void realizedReservation() {
+    void testDeleteReservation() {
+        reservationClient.deleteReservation(1L);
+        verify(restTemplate).delete(URL + "/" + 1);
     }
 }

@@ -68,10 +68,13 @@ public class ReservationClient {
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return headers;
     }
+
     private <T> List<T> exchangeAsList(String url) {
-        var responseType = new ParameterizedTypeReference<List<T>>(){};
+        var responseType = new ParameterizedTypeReference<List<T>>() {
+        };
         return restTemplate.exchange(url, HttpMethod.GET, null, responseType).getBody();
     }
+
     private ReservationDto reservationDtoChangeReservationStatus(String url) {
         var request = new HttpEntity<>(headers);
         return restTemplate.exchange(url,
