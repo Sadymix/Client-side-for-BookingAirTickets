@@ -3,6 +3,7 @@ package com.pgs.client.service;
 import com.pgs.client.dto.PassengerDto;
 import com.pgs.client.dto.ReservationDto;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,8 +28,6 @@ class ReservationClientTest {
 
     @Mock
     private ResponseEntity<ReservationDto> responseEntity;
-    @Mock
-    private ResponseEntity<List<ReservationDto>> responseEntityList;
     @Mock
     private RestTemplate restTemplate;
     @InjectMocks
@@ -66,47 +65,7 @@ class ReservationClientTest {
         assertThat(reservation).isEqualTo(RESERVATION);
     }
 
-    @Test
-    void testGetReservationsByFlight() {
-        when(restTemplate.exchange(
-                eq(URL + "/flights/23"),
-                eq(HttpMethod.GET),
-                nullable(HttpEntity.class),
-                any(ParameterizedTypeReference.class)))
-                .thenReturn(responseEntityList);
-        when(responseEntityList.getBody()).thenReturn(List.of(RESERVATION));
-        var reservations = reservationClient.getReservationsByFlight(23L);
-        assertThat(reservations).isNotNull();
-        assertThat(reservations).isEqualTo(List.of(RESERVATION));
-    }
 
-    @Test
-    void testGetReservationsForCurrentUser() {
-        when(restTemplate.exchange(
-                eq(URL + "/users"),
-                eq(HttpMethod.GET),
-                nullable(HttpEntity.class),
-                any(ParameterizedTypeReference.class)))
-                .thenReturn(responseEntityList);
-        when(responseEntityList.getBody()).thenReturn(List.of(RESERVATION));
-        var reservations = reservationClient.getReservationsForCurrentUser();
-        assertThat(reservations).isNotNull();
-        assertThat(reservations).isEqualTo(List.of(RESERVATION));
-    }
-
-    @Test
-    void testGetReservationsByUser() {
-        when(restTemplate.exchange(
-                eq(URL + "/users/" + 1),
-                eq(HttpMethod.GET),
-                nullable(HttpEntity.class),
-                any(ParameterizedTypeReference.class)))
-                .thenReturn(responseEntityList);
-        when(responseEntityList.getBody()).thenReturn(List.of(RESERVATION));
-        var reservations = reservationClient.getReservationsByUser(1L);
-        assertThat(reservations).isNotNull();
-        assertThat(reservations).isEqualTo(List.of(RESERVATION));
-    }
 
     @Test
     void testAddReservation() {
@@ -141,5 +100,44 @@ class ReservationClientTest {
     void testDeleteReservation() {
         reservationClient.deleteReservation(1L);
         verify(restTemplate).delete(URL + "/" + 1);
+    }
+
+    @Nested
+    class getListOfReservationDtoTestCases {
+
+        @Mock
+        private ResponseEntity<List<ReservationDto>> responseEntityList;
+
+        @BeforeEach
+        void setUp() {
+            when(restTemplate.exchange(
+                    anyString(),
+                    eq(HttpMethod.GET),
+                    nullable(HttpEntity.class),
+                    any(ParameterizedTypeReference.class)))
+                    .thenReturn(responseEntityList);
+            when(responseEntityList.getBody()).thenReturn(List.of(RESERVATION));
+        }
+
+        @Test
+        void testGetReservationsByFlight() {
+            var reservations = reservationClient.getReservationsByFlight(1L);
+            assertThat(reservations).isNotNull();
+            assertThat(reservations).isEqualTo(List.of(RESERVATION));
+        }
+
+        @Test
+        void testGetReservationsForCurrentUser() {
+            var reservations = reservationClient.getReservationsForCurrentUser();
+            assertThat(reservations).isNotNull();
+            assertThat(reservations).isEqualTo(List.of(RESERVATION));
+        }
+
+        @Test
+        void testGetReservationsByUser() {
+            var reservations = reservationClient.getReservationsByUser(1L);
+            assertThat(reservations).isNotNull();
+            assertThat(reservations).isEqualTo(List.of(RESERVATION));
+        }
     }
 }
