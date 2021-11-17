@@ -1,6 +1,5 @@
 package com.pgs.client.service;
 
-import com.pgs.client.component.Client;
 import com.pgs.client.dto.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,6 +24,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserClientTest {
 
+    @Mock
+    private ResponseEntity<UserDto> responseEntity;
     @Mock
     private RestTemplate restTemplate;
     @InjectMocks
@@ -39,13 +42,12 @@ class UserClientTest {
             .roles(List.of("ADMIN"))
             .build();
     private static final UserDto USER_DTO1 = UserDto.builder()
-            .enabled(false)
+            .enabled(true)
             .build();
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(userClient, "apiUsersUrl", URL);
-        Client.TOKEN = "qwerty";
     }
 
     @Test
@@ -68,31 +70,37 @@ class UserClientTest {
 
     @Test
     void testActivateUser() {
-        when(restTemplate.postForObject(eq(URL + "/1/activate"),
+        when(restTemplate.exchange(eq(URL + "/1/activate"), eq(HttpMethod.PUT),
                 any(HttpEntity.class), eq(UserDto.class)))
-                .thenReturn(USER_DTO1);
+                .thenReturn(responseEntity);
+        when(responseEntity.getBody()).thenReturn(USER_DTO1);
         var user = userClient.activateUser(1L);
-        verify(restTemplate).postForObject(anyString(), any(HttpEntity.class), any(Class.class));
-        assertEquals(user, USER_DTO1);
+        verify(restTemplate).exchange(anyString(), any(HttpMethod.class),
+                any(HttpEntity.class), any(Class.class));
+        assertEquals(user.isEnabled(), USER_DTO1.isEnabled());
     }
 
     @Test
     void testDeactivateUser() {
-        when(restTemplate.postForObject(eq(URL + "/1/deactivate"),
+        when(restTemplate.exchange(eq(URL + "/1/deactivate"), eq(HttpMethod.PUT),
                 any(HttpEntity.class), eq(UserDto.class)))
-                .thenReturn(USER_DTO);
+                .thenReturn(responseEntity);
+        when(responseEntity.getBody()).thenReturn(USER_DTO);
         var user = userClient.deactivateUser(1L);
-        verify(restTemplate).postForObject(anyString(), any(HttpEntity.class), any(Class.class));
-        assertEquals(user, USER_DTO);
+        verify(restTemplate).exchange(anyString(),any(HttpMethod.class),
+                any(HttpEntity.class), any(Class.class));
+        assertEquals(user.isEnabled(), USER_DTO.isEnabled());
     }
 
     @Test
     void testSetRoles() {
-        when(restTemplate.postForObject(eq(URL + "/1/setRoles"),
+        when(restTemplate.exchange(eq(URL + "/1/setRoles"), eq(HttpMethod.PUT),
                 any(HttpEntity.class), eq(UserDto.class)))
-                .thenReturn(USER_DTO);
+                .thenReturn(responseEntity);
+        when(responseEntity.getBody()).thenReturn(USER_DTO);
         var userDto = userClient.setUserRoles(1L, List.of("ADMIN"));
-        verify(restTemplate).postForObject(anyString(), any(HttpEntity.class), any(Class.class));
+        verify(restTemplate).exchange(anyString(), any(HttpMethod.class),
+                any(HttpEntity.class), any(Class.class));
         assertEquals(userDto.getRoles(), USER_DTO.getRoles());
     }
 }
