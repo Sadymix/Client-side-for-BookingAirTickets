@@ -26,8 +26,6 @@ import static org.mockito.Mockito.when;
 class ReservationClientTest {
 
     @Mock
-    private ParameterizedTypeReference<List<ReservationDto>> responseType;
-    @Mock
     private ResponseEntity<ReservationDto> responseEntity;
     @Mock
     private ResponseEntity<List<ReservationDto>> responseEntityList;
