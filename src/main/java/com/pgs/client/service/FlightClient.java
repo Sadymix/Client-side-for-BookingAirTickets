@@ -1,12 +1,12 @@
 package com.pgs.client.service;
 
-import com.pgs.client.component.Client;
 import com.pgs.client.dto.FlightDto;
-import com.pgs.client.dto.list.FlightDtoList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -25,9 +25,12 @@ public class FlightClient {
     private static HttpHeaders headers = getHeaders();
 
     public List<FlightDto> getFlights() {
-        return restTemplate.getForObject(
+        var responseType = new ParameterizedTypeReference<List<FlightDto>>(){};
+        return restTemplate.exchange(
                 apiUsersUrl,
-                FlightDtoList.class).getFlights();
+                HttpMethod.GET,
+                null,
+                responseType).getBody();
     }
 
     public FlightDto getFlight(Long id) {
@@ -45,20 +48,19 @@ public class FlightClient {
 
     public FlightDto editFlight(FlightDto flightDto, Long id) {
         var request = new HttpEntity<>(flightDto, headers);
-        return restTemplate.postForObject(
+        return restTemplate.exchange(
                 apiUsersUrl +"/" +id,
+                HttpMethod.PUT,
                 request,
-                FlightDto.class);
+                FlightDto.class).getBody();
     }
 
-    public String deleteFlight(Long id) {
+    public void deleteFlight(Long id) {
         restTemplate.delete(apiUsersUrl +"/" + id);
-        return "Success delete flight with id: " + id;
     }
 
     private static HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(Client.TOKEN);
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return headers;

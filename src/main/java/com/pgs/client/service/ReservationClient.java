@@ -1,12 +1,12 @@
 package com.pgs.client.service;
 
-import com.pgs.client.component.Client;
 import com.pgs.client.dto.ReservationDto;
-import com.pgs.client.dto.list.ReservationDtoList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,7 +19,7 @@ public class ReservationClient {
 
     private final RestTemplate restTemplate;
 
-    @Value("${app.url.reservations")
+    @Value("${app.url.reservations}")
     private String apiReservationsUrl;
     private static HttpHeaders headers = getHeaders();
 
@@ -30,23 +30,16 @@ public class ReservationClient {
     }
 
     public List<ReservationDto> getReservationsByFlight(Long id) {
-
-        return restTemplate.getForObject(
-                apiReservationsUrl + "/flights/" + id,
-                ReservationDtoList.class).getReservations();
+        return exchangeAsList(apiReservationsUrl + "/flights/" + id);
     }
 
     public List<ReservationDto> getReservationsForCurrentUser() {
-        return restTemplate.getForObject(
-                apiReservationsUrl + "/users",
-                ReservationDtoList.class).getReservations();
+        return exchangeAsList(
+                apiReservationsUrl + "/users");
     }
 
     public List<ReservationDto> getReservationsByUser(Long id) {
-
-        return restTemplate.getForObject(
-                apiReservationsUrl + "/users/" + id,
-                ReservationDtoList.class).getReservations();
+        return exchangeAsList(apiReservationsUrl + "/users/" + id);
     }
 
     public ReservationDto addReservation(ReservationDto reservationDto) {
@@ -57,11 +50,6 @@ public class ReservationClient {
                 ReservationDto.class);
     }
 
-    public String deleteReservation(Long id) {
-        restTemplate.delete(apiReservationsUrl + "/" + id);
-        return "Success delete reservation with id: " + id;
-    }
-
     public ReservationDto cancelReservation(Long id) {
         return reservationDtoChangeReservationStatus(apiReservationsUrl + "/" + id + "/canceled");
     }
@@ -70,18 +58,25 @@ public class ReservationClient {
         return reservationDtoChangeReservationStatus(apiReservationsUrl + "/" + id + "/realized");
     }
 
-    private ReservationDto reservationDtoChangeReservationStatus(String url) {
-        var request = new HttpEntity<>(headers);
-        return restTemplate.postForObject(url,
-                request,
-                ReservationDto.class);
+    public void deleteReservation(Long id) {
+        restTemplate.delete(apiReservationsUrl + "/" + id);
     }
 
     private static HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(Client.TOKEN);
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return headers;
+    }
+    private <T> List<T> exchangeAsList(String url) {
+        var responseType = new ParameterizedTypeReference<List<T>>(){};
+        return restTemplate.exchange(url, HttpMethod.GET, null, responseType).getBody();
+    }
+    private ReservationDto reservationDtoChangeReservationStatus(String url) {
+        var request = new HttpEntity<>(headers);
+        return restTemplate.exchange(url,
+                HttpMethod.PUT,
+                request,
+                ReservationDto.class).getBody();
     }
 }

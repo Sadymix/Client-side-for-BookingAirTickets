@@ -1,12 +1,12 @@
 package com.pgs.client.service;
 
-import com.pgs.client.component.Client;
 import com.pgs.client.dto.AirportDto;
-import com.pgs.client.dto.list.AirportDtoList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -24,45 +24,46 @@ public class AirportClient {
     private static HttpHeaders headers = getHeaders();
 
     public List<AirportDto> getAirports() {
-        var request = new HttpEntity<>(headers);
-        return restTemplate.getForObject(
+        var responseType = new ParameterizedTypeReference<List<AirportDto>>() {
+        };
+        return restTemplate.exchange(
                 apiAirportsUrl,
-                AirportDtoList.class,
-                request).getAirports();
+                HttpMethod.GET,
+                null,
+                responseType).getBody();
     }
 
     public AirportDto getAirportById(Long id) {
-        var request = new HttpEntity<>(headers);
         return restTemplate.getForObject(
-                apiAirportsUrl +"/" + id,
-                AirportDto.class,
-                request);
+                apiAirportsUrl + "/" + id,
+                AirportDto.class);
     }
 
-    public AirportDto getAirportByCode(){
-        var request = new HttpEntity<>(headers);
-        return restTemplate.getForObject(apiAirportsUrl+"/",
-                AirportDto.class,
-                request);
+    public AirportDto getAirportByCode(String code) {
+        return restTemplate.getForObject(
+                apiAirportsUrl + "?code=" + code,
+                AirportDto.class);
     }
 
-    public AirportDto addAirport(AirportDto airportDto){
+    public AirportDto addAirport(AirportDto airportDto) {
         var request = new HttpEntity<>(airportDto, headers);
-        return restTemplate.postForObject(apiAirportsUrl,
+        return restTemplate.postForObject(
+                apiAirportsUrl,
                 request,
                 AirportDto.class);
     }
 
-    public AirportDto editAirport(AirportDto airportDto, Long id){
+    public AirportDto editAirport(AirportDto airportDto, Long id) {
         var request = new HttpEntity<>(airportDto, headers);
-        return restTemplate.postForObject(apiAirportsUrl +"/" + id,
+        return restTemplate.exchange(
+                apiAirportsUrl + "/" + id,
+                HttpMethod.PUT,
                 request,
-                AirportDto.class);
+                AirportDto.class).getBody();
     }
 
     private static HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(Client.TOKEN);
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return headers;

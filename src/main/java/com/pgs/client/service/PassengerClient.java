@@ -1,11 +1,12 @@
 package com.pgs.client.service;
 
 import com.pgs.client.dto.PassengerDto;
-import com.pgs.client.dto.list.PassengerDtoList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -20,17 +21,23 @@ public class PassengerClient {
     @Value("${app.url.passengers}")
     private String apiPassengersUrl;
     private static HttpHeaders headers = getHeaders();
+
     public List<PassengerDto> getPassengers() {
-        return restTemplate.getForObject(
+        var responseType = new ParameterizedTypeReference<List<PassengerDto>>() {
+        };
+        return restTemplate.exchange(
                 apiPassengersUrl,
-                PassengerDtoList.class).getPassengers();
+                HttpMethod.GET,
+                null,
+                responseType).getBody();
     }
 
     public PassengerDto getSinglePassenger(Long id) {
         return restTemplate.getForObject(
-                apiPassengersUrl +"/" +id,
+                apiPassengersUrl + "/" + id,
                 PassengerDto.class);
     }
+
     public PassengerDto addPassenger(PassengerDto passengerDto) {
         var request = new HttpEntity<>(passengerDto, headers);
         return restTemplate.postForObject(apiPassengersUrl,
@@ -40,9 +47,11 @@ public class PassengerClient {
 
     public PassengerDto editPassenger(PassengerDto passengerDto, Long id) {
         var request = new HttpEntity<>(passengerDto, headers);
-        return restTemplate.postForObject(apiPassengersUrl +"/"+id,
+        return restTemplate.exchange(
+                apiPassengersUrl + "/" + id,
+                HttpMethod.PUT,
                 request,
-                PassengerDto.class);
+                PassengerDto.class).getBody();
     }
 
     private static HttpHeaders getHeaders() {

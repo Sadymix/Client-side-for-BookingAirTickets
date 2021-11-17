@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -45,18 +46,20 @@ public class UserClient {
 
     public UserDto setUserRoles(Long id, List<String> roleList) {
         var request = new HttpEntity<>(roleList, headers);
-        return restTemplate.postForObject(
+        return restTemplate.exchange(
                 apiUsersUrl + "/" + id + "/setRoles",
+                HttpMethod.PUT,
                 request,
-                UserDto.class);
+                UserDto.class).getBody();
     }
 
     private UserDto setUserEnabled(String url) {
         var request = new HttpEntity<>(headers);
-        return restTemplate.postForObject(
+        return restTemplate.exchange(
                 url,
+                HttpMethod.PUT,
                 request,
-                UserDto.class);
+                UserDto.class).getBody();
     }
 
     private static HttpHeaders getHeaders() {
