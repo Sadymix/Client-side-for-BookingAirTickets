@@ -20,14 +20,14 @@ public class FlightClient {
     private final RestTemplate restTemplate;
 
     @Value("${app.url.flights}")
-    private String apiUsersUrl;
+    private String apiFlightsUrl;
 
     private static HttpHeaders headers = getHeaders();
 
     public List<FlightDto> getFlights() {
         var responseType = new ParameterizedTypeReference<List<FlightDto>>(){};
         return restTemplate.exchange(
-                apiUsersUrl,
+                apiFlightsUrl,
                 HttpMethod.GET,
                 null,
                 responseType).getBody();
@@ -35,13 +35,13 @@ public class FlightClient {
 
     public FlightDto getFlight(Long id) {
         return restTemplate.getForObject(
-                apiUsersUrl+"/"+id,
+                apiFlightsUrl +"/"+id,
                 FlightDto.class);
     }
 
     public FlightDto addFlight(FlightDto flightDto) {
         var request = new HttpEntity<>(flightDto, headers);
-        return restTemplate.postForObject(apiUsersUrl,
+        return restTemplate.postForObject(apiFlightsUrl,
                 request,
                 FlightDto.class);
     }
@@ -49,14 +49,14 @@ public class FlightClient {
     public FlightDto editFlight(FlightDto flightDto, Long id) {
         var request = new HttpEntity<>(flightDto, headers);
         return restTemplate.exchange(
-                apiUsersUrl +"/" +id,
+                apiFlightsUrl +"/" +id,
                 HttpMethod.PUT,
                 request,
                 FlightDto.class).getBody();
     }
 
     public void deleteFlight(Long id) {
-        restTemplate.delete(apiUsersUrl +"/" + id);
+        restTemplate.delete(apiFlightsUrl +"/" + id);
     }
 
     private static HttpHeaders getHeaders() {
