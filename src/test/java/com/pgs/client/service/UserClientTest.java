@@ -56,6 +56,7 @@ class UserClientTest {
                 .thenReturn(USER_DTO);
         var user = userClient.getSingleUser(1L);
         verify(restTemplate).getForObject(anyString(), any(Class.class));
+        assertThat(user).isNotNull();
         assertEquals(user, USER_DTO);
     }
 
