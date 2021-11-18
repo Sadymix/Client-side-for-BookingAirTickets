@@ -3,6 +3,7 @@ package com.pgs.client.service;
 import com.pgs.client.dto.PassengerDto;
 import com.pgs.client.dto.ReservationDto;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,8 +45,6 @@ class ReservationClientTest {
     @Mock
     private ResponseEntity<ReservationDto> responseEntity;
     @Mock
-    private ResponseEntity<List<ReservationDto>> responseEntityList;
-    @Mock
     private RestTemplate restTemplate;
     @InjectMocks
     private ReservationClient reservationClient;
@@ -66,48 +65,6 @@ class ReservationClientTest {
     }
 
     @Test
-    void testGetReservationsByFlight() {
-        when(restTemplate.exchange(
-                eq(URL + "/flights/23"),
-                eq(HttpMethod.GET),
-                nullable(HttpEntity.class),
-                any(ParameterizedTypeReference.class)))
-                .thenReturn(responseEntityList);
-        when(responseEntityList.getBody()).thenReturn(List.of(RESERVATION));
-        var reservations = reservationClient.getReservationsByFlight(23L);
-        assertThat(reservations).isNotNull();
-        assertThat(reservations).isEqualTo(List.of(RESERVATION));
-    }
-
-    @Test
-    void testGetReservationsForCurrentUser() {
-        when(restTemplate.exchange(
-                eq(URL + "/users"),
-                eq(HttpMethod.GET),
-                nullable(HttpEntity.class),
-                any(ParameterizedTypeReference.class)))
-                .thenReturn(responseEntityList);
-        when(responseEntityList.getBody()).thenReturn(List.of(RESERVATION));
-        var reservations = reservationClient.getReservationsForCurrentUser();
-        assertThat(reservations).isNotNull();
-        assertThat(reservations).isEqualTo(List.of(RESERVATION));
-    }
-
-    @Test
-    void testGetReservationsByUser() {
-        when(restTemplate.exchange(
-                eq(URL + "/users/" + 1),
-                eq(HttpMethod.GET),
-                nullable(HttpEntity.class),
-                any(ParameterizedTypeReference.class)))
-                .thenReturn(responseEntityList);
-        when(responseEntityList.getBody()).thenReturn(List.of(RESERVATION));
-        var reservations = reservationClient.getReservationsByUser(1L);
-        assertThat(reservations).isNotNull();
-        assertThat(reservations).isEqualTo(List.of(RESERVATION));
-    }
-
-    @Test
     void testAddReservation() {
         when(restTemplate.postForObject(eq(URL), any(HttpEntity.class), eq(ReservationDto.class)))
                 .thenReturn(RESERVATION);
@@ -119,7 +76,7 @@ class ReservationClientTest {
     @Test
     void testCancelReservation() {
         when(restTemplate.exchange(eq(URL + "/" + 1 + "/canceled"), eq(HttpMethod.PUT),
-                any(HttpEntity.class), eq(ReservationDto.class)))
+                nullable(HttpEntity.class), eq(ReservationDto.class)))
                 .thenReturn(responseEntity);
         when(responseEntity.getBody()).thenReturn(RESERVATION_CANCELED);
         var reservation = reservationClient.cancelReservation(1L);
@@ -129,7 +86,7 @@ class ReservationClientTest {
     @Test
     void testRealizedReservation() {
         when(restTemplate.exchange(eq(URL + "/" + 1 + "/realized"), eq(HttpMethod.PUT),
-                any(HttpEntity.class), eq(ReservationDto.class)))
+                nullable(HttpEntity.class), eq(ReservationDto.class)))
                 .thenReturn(responseEntity);
         when(responseEntity.getBody()).thenReturn(RESERVATION_REALIZED);
         var reservation = reservationClient.realizedReservation(1L);
@@ -143,7 +100,7 @@ class ReservationClientTest {
     }
 
     @Nested
-    class getListOfReservationDtoTestCases {
+    class GetListOfReservationDtoTestCases {
 
         @Mock
         private ResponseEntity<List<ReservationDto>> responseEntityList;
