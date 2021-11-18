@@ -120,7 +120,7 @@ class ReservationClientTest {
     @Test
     void testCancelReservation() {
         when(restTemplate.exchange(eq(URL + "/" + 1 + "/canceled"), eq(HttpMethod.PUT),
-                any(HttpEntity.class), eq(ReservationDto.class)))
+                nullable(HttpEntity.class), eq(ReservationDto.class)))
                 .thenReturn(responseEntity);
         when(responseEntity.getBody()).thenReturn(RESERVATION_CANCELED);
         var reservation = reservationClient.cancelReservation(1L);
@@ -130,7 +130,7 @@ class ReservationClientTest {
     @Test
     void testRealizedReservation() {
         when(restTemplate.exchange(eq(URL + "/" + 1 + "/realized"), eq(HttpMethod.PUT),
-                any(HttpEntity.class), eq(ReservationDto.class)))
+                nullable(HttpEntity.class), eq(ReservationDto.class)))
                 .thenReturn(responseEntity);
         when(responseEntity.getBody()).thenReturn(RESERVATION_REALIZED);
         var reservation = reservationClient.realizedReservation(1L);

@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,7 +19,6 @@ public class ReservationClient {
 
     @Value("${app.url.reservations}")
     private String apiReservationsUrl;
-    private static HttpHeaders headers = getHeaders();
 
     public ReservationDto getReservationWithPassengersAndFlight(Long id) {
         return restTemplate.getForObject(
@@ -43,7 +40,7 @@ public class ReservationClient {
     }
 
     public ReservationDto addReservation(ReservationDto reservationDto) {
-        var request = new HttpEntity<>(reservationDto, headers);
+        var request = new HttpEntity<>(reservationDto);
         return restTemplate.postForObject(
                 apiReservationsUrl,
                 request,
@@ -62,13 +59,6 @@ public class ReservationClient {
         restTemplate.delete(apiReservationsUrl + "/" + id);
     }
 
-    private static HttpHeaders getHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        return headers;
-    }
-
     private <T> List<T> exchangeAsList(String url) {
         var responseType = new ParameterizedTypeReference<List<T>>() {
         };
@@ -76,10 +66,9 @@ public class ReservationClient {
     }
 
     private ReservationDto reservationDtoChangeReservationStatus(String url) {
-        var request = new HttpEntity<>(headers);
         return restTemplate.exchange(url,
                 HttpMethod.PUT,
-                request,
+                null,
                 ReservationDto.class).getBody();
     }
 }

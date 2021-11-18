@@ -4,9 +4,7 @@ import com.pgs.client.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,7 +18,6 @@ public class UserClient {
 
     @Value("${app.url.user}")
     private String apiUsersUrl;
-    private static HttpHeaders headers = getHeaders();
 
     public UserDto getSingleUser(Long id) {
         return restTemplate.getForObject(
@@ -29,7 +26,7 @@ public class UserClient {
     }
 
     public UserDto addUser(UserDto userDto) {
-        var request = new HttpEntity<>(userDto, headers);
+        var request = new HttpEntity<>(userDto);
         return restTemplate.postForObject(
                 apiUsersUrl,
                 request,
@@ -45,7 +42,7 @@ public class UserClient {
     }
 
     public UserDto setUserRoles(Long id, List<String> roleList) {
-        var request = new HttpEntity<>(roleList, headers);
+        var request = new HttpEntity<>(roleList);
         return restTemplate.exchange(
                 apiUsersUrl + "/" + id + "/setRoles",
                 HttpMethod.PUT,
@@ -54,18 +51,10 @@ public class UserClient {
     }
 
     private UserDto setUserEnabled(String url) {
-        var request = new HttpEntity<>(headers);
         return restTemplate.exchange(
                 url,
                 HttpMethod.PUT,
-                request,
+                null,
                 UserDto.class).getBody();
-    }
-
-    private static HttpHeaders getHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        return headers;
     }
 }

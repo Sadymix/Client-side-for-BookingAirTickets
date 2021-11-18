@@ -72,24 +72,24 @@ class UserClientTest {
     @Test
     void testActivateUser() {
         when(restTemplate.exchange(eq(URL + "/1/activate"), eq(HttpMethod.PUT),
-                any(HttpEntity.class), eq(UserDto.class)))
+                nullable(HttpEntity.class), eq(UserDto.class)))
                 .thenReturn(responseEntity);
         when(responseEntity.getBody()).thenReturn(USER_DTO1);
         var user = userClient.activateUser(1L);
         verify(restTemplate).exchange(anyString(), any(HttpMethod.class),
-                any(HttpEntity.class), any(Class.class));
+                nullable(HttpEntity.class), any(Class.class));
         assertEquals(user.isEnabled(), USER_DTO1.isEnabled());
     }
 
     @Test
     void testDeactivateUser() {
         when(restTemplate.exchange(eq(URL + "/1/deactivate"), eq(HttpMethod.PUT),
-                any(HttpEntity.class), eq(UserDto.class)))
+                nullable(HttpEntity.class), eq(UserDto.class)))
                 .thenReturn(responseEntity);
         when(responseEntity.getBody()).thenReturn(USER_DTO);
         var user = userClient.deactivateUser(1L);
         verify(restTemplate).exchange(anyString(),any(HttpMethod.class),
-                any(HttpEntity.class), any(Class.class));
+                nullable(HttpEntity.class), any(Class.class));
         assertEquals(user.isEnabled(), USER_DTO.isEnabled());
     }
 

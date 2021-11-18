@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,7 +19,6 @@ public class AirportClient {
 
     @Value("${app.url.airports}")
     private String apiAirportsUrl;
-    private static HttpHeaders headers = getHeaders();
 
     public List<AirportDto> getAirports() {
         var responseType = new ParameterizedTypeReference<List<AirportDto>>() {
@@ -46,7 +43,7 @@ public class AirportClient {
     }
 
     public AirportDto addAirport(AirportDto airportDto) {
-        var request = new HttpEntity<>(airportDto, headers);
+        var request = new HttpEntity<>(airportDto);
         return restTemplate.postForObject(
                 apiAirportsUrl,
                 request,
@@ -54,18 +51,11 @@ public class AirportClient {
     }
 
     public AirportDto editAirport(AirportDto airportDto, Long id) {
-        var request = new HttpEntity<>(airportDto, headers);
+        var request = new HttpEntity<>(airportDto);
         return restTemplate.exchange(
                 apiAirportsUrl + "/" + id,
                 HttpMethod.PUT,
                 request,
                 AirportDto.class).getBody();
-    }
-
-    private static HttpHeaders getHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        return headers;
     }
 }
