@@ -17,12 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Client {
 
-    private final UserClient userClient;
-    private final ReservationClient reservationClient;
-    private final PassengerClient passengerClient;
-    private final AirportClient airportClient;
-    private final FlightClient flightClient;
-
     private static final UserDto USER_DTO = UserDto.builder()
             .username("user0")
             .password("pass0")
@@ -64,6 +58,11 @@ public class Client {
             .departureAirportIataCode("TLG")
             .arrivalAirportIataCode("HAE")
             .build();
+    private final UserClient userClient;
+    private final ReservationClient reservationClient;
+    private final PassengerClient passengerClient;
+    private final AirportClient airportClient;
+    private final FlightClient flightClient;
 
     @PostConstruct
     public void postConstruct() {
