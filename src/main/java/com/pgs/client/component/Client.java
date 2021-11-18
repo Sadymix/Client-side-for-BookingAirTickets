@@ -22,9 +22,8 @@ public class Client {
     private final PassengerClient passengerClient;
     private final AirportClient airportClient;
     private final FlightClient flightClient;
-    private final WeatherClient weatherClient;
 
-    private static UserDto userDto = UserDto.builder()
+    private static final UserDto USER_DTO = UserDto.builder()
             .username("user0")
             .password("pass0")
             .accountNonExpired(true)
@@ -33,32 +32,32 @@ public class Client {
             .enabled(true)
             .roles(List.of("USER"))
             .build();
-    private static PassengerDto passengerDto = PassengerDto.builder()
+    private static final PassengerDto PASSENGER_DTO = PassengerDto.builder()
             .firstName("Jim")
             .lastName("One")
             .email("JimOne@nose.org")
             .country("USA")
             .telephone("301242142")
             .build();
-    private static PassengerDto passengerDto1 = PassengerDto.builder()
+    private static final PassengerDto PASSENGER_DTO1 = PassengerDto.builder()
             .firstName("One")
             .lastName("One")
             .email("oneone@nose.org")
             .country("USA")
             .telephone("123141242")
             .build();
-    private static ReservationDto reservationDto = ReservationDto.builder()
+    private static final ReservationDto RESERVATION_DTO = ReservationDto.builder()
             .flightId(1L)
             .status(ReservationDto.ReservationStatus.IN_PROGRESS)
-            .passengers(List.of(passengerDto))
+            .passengers(List.of(PASSENGER_DTO))
             .userId(2L)
             .build();
-    private static AirportDto airportDto = AirportDto.builder()
+    private static final AirportDto AIRPORT_DTO = AirportDto.builder()
             .code("ASD")
             .name("Airport")
             .country("USA")
             .build();
-    private static FlightDto flightDto = FlightDto.builder()
+    private static final FlightDto FLIGHT_DTO = FlightDto.builder()
             .type(FlightDto.TypeOfFlight.ECONOMY)
             .departureDate(LocalDateTime.now())
             .arrivalDate(LocalDateTime.now())
@@ -68,53 +67,52 @@ public class Client {
 
     @PostConstruct
     public void postConstruct() {
-        userClientPostConstruct();
-        reservationClientPostConstruct();
-        passengerClientPostConstruct();
-        airportClientPostConstruct();
-        flightClientPostConstruct();
-        weatherClient.getWeatherByCity("Warsaw");
+        userClientDemo();
+        reservationClientDemo();
+        passengerClientDemo();
+        airportClientDemo();
+        flightClientDemo();
     }
 
-    private void userClientPostConstruct() {
+    private void userClientDemo() {
         userClient.getSingleUser(1L);
-        userClient.addUser(userDto);
+        userClient.addUser(USER_DTO);
         userClient.deactivateUser(1L);
         userClient.activateUser(1L);
         userClient.setUserRoles(1L, List.of("USER", "STAFF"));
     }
 
-    private void reservationClientPostConstruct() {
+    private void reservationClientDemo() {
         reservationClient.getReservationWithPassengersAndFlight(2L);
         reservationClient.getReservationsByFlight(1L);
         reservationClient.getReservationsForCurrentUser();
         reservationClient.getReservationsByUser(1L);
-        reservationClient.addReservation(reservationDto);
+        reservationClient.addReservation(RESERVATION_DTO);
         reservationClient.cancelReservation(2L);
         reservationClient.realizedReservation(2L);
         reservationClient.deleteReservation(1L);
     }
 
-    private void passengerClientPostConstruct() {
+    private void passengerClientDemo() {
         passengerClient.getPassengers();
         passengerClient.getSinglePassenger(2L);
-        passengerClient.addPassenger(passengerDto);
-        passengerClient.editPassenger(passengerDto1, 4L);
+        passengerClient.addPassenger(PASSENGER_DTO);
+        passengerClient.editPassenger(PASSENGER_DTO1, 4L);
     }
 
-    private void airportClientPostConstruct() {
+    private void airportClientDemo() {
         airportClient.getAirports();
         airportClient.getAirportById(1L);
         airportClient.getAirportByCode("YYC");
-        airportClient.addAirport(airportDto);
-        airportClient.editAirport(airportDto, 123L);
+        airportClient.addAirport(AIRPORT_DTO);
+        airportClient.editAirport(AIRPORT_DTO, 123L);
     }
 
-    private void flightClientPostConstruct() {
+    private void flightClientDemo() {
         flightClient.getFlights();
         flightClient.getFlight(4L);
-        flightClient.addFlight(flightDto);
-        flightClient.editFlight(flightDto, 1L);
+        flightClient.addFlight(FLIGHT_DTO);
+        flightClient.editFlight(FLIGHT_DTO, 1L);
         flightClient.deleteFlight(3L);
     }
 
