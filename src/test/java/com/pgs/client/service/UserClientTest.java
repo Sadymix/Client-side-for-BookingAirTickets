@@ -24,13 +24,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserClientTest {
 
-    @Mock
-    private ResponseEntity<UserDto> responseEntity;
-    @Mock
-    private RestTemplate restTemplate;
-    @InjectMocks
-    private UserClient userClient;
-
     private static final String URL = "http://localhost:8080/api/users";
     private static final UserDto USER_DTO = UserDto.builder()
             .username("user1")
@@ -44,6 +37,12 @@ class UserClientTest {
     private static final UserDto USER_DTO1 = UserDto.builder()
             .enabled(true)
             .build();
+    @Mock
+    private ResponseEntity<UserDto> responseEntity;
+    @Mock
+    private RestTemplate restTemplate;
+    @InjectMocks
+    private UserClient userClient;
 
     @BeforeEach
     void setUp() {
@@ -88,7 +87,7 @@ class UserClientTest {
                 .thenReturn(responseEntity);
         when(responseEntity.getBody()).thenReturn(USER_DTO);
         var user = userClient.deactivateUser(1L);
-        verify(restTemplate).exchange(anyString(),any(HttpMethod.class),
+        verify(restTemplate).exchange(anyString(), any(HttpMethod.class),
                 nullable(HttpEntity.class), any(Class.class));
         assertEquals(user.isEnabled(), USER_DTO.isEnabled());
     }

@@ -23,6 +23,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AirportClientTest {
 
+    private static final String URL = "http://localhost:8080/api/airports";
+    private static final AirportDto AIRPORT = AirportDto.builder()
+            .code("ASD")
+            .name("Airport")
+            .country("US")
+            .build();
     @Mock
     private ResponseEntity<AirportDto> responseEntity;
     @Mock
@@ -31,13 +37,6 @@ class AirportClientTest {
     private RestTemplate restTemplate;
     @InjectMocks
     private AirportClient airportClient;
-
-    private static final String URL = "http://localhost:8080/api/airports";
-    private static final AirportDto AIRPORT = AirportDto.builder()
-            .code("ASD")
-            .name("Airport")
-            .country("US")
-            .build();
 
     @BeforeEach
     void setUp() {

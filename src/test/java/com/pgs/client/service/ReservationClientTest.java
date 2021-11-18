@@ -25,15 +25,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ReservationClientTest {
 
-    @Mock
-    private ResponseEntity<ReservationDto> responseEntity;
-    @Mock
-    private ResponseEntity<List<ReservationDto>> responseEntityList;
-    @Mock
-    private RestTemplate restTemplate;
-    @InjectMocks
-    private ReservationClient reservationClient;
-
     private static final String URL = "http://localhost:8080/api/reservations";
     private static final PassengerDto PASSENGER = PassengerDto.builder()
             .firstName("John")
@@ -50,6 +41,14 @@ class ReservationClientTest {
     private static final ReservationDto RESERVATION_REALIZED = ReservationDto.builder()
             .status(ReservationDto.ReservationStatus.REALIZED)
             .build();
+    @Mock
+    private ResponseEntity<ReservationDto> responseEntity;
+    @Mock
+    private ResponseEntity<List<ReservationDto>> responseEntityList;
+    @Mock
+    private RestTemplate restTemplate;
+    @InjectMocks
+    private ReservationClient reservationClient;
 
     @BeforeEach
     void setUp() {

@@ -25,15 +25,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class FlightClientTest {
 
-    @Mock
-    private ResponseEntity<List<FlightDto>> responseEntityList;
-    @Mock
-    private ResponseEntity<FlightDto> responseEntity;
-    @Mock
-    private RestTemplate restTemplate;
-    @InjectMocks
-    private FlightClient flightClient;
-
     private static final String URL = "http://localhost:8080/api/flights";
     private static final FlightDto FLIGHT = FlightDto.builder()
             .type(FlightDto.TypeOfFlight.ECONOMY)
@@ -42,6 +33,14 @@ class FlightClientTest {
             .departureAirportIataCode("ASD")
             .arrivalAirportIataCode("DSA")
             .build();
+    @Mock
+    private ResponseEntity<List<FlightDto>> responseEntityList;
+    @Mock
+    private ResponseEntity<FlightDto> responseEntity;
+    @Mock
+    private RestTemplate restTemplate;
+    @InjectMocks
+    private FlightClient flightClient;
 
     @BeforeEach
     void setUp() {

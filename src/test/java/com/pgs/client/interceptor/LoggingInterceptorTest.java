@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith({OutputCaptureExtension.class, MockitoExtension.class})
 class LoggingInterceptorTest {
 
+    private static byte[] BODY = new byte[20];
     @Mock
     private HttpRequest httpRequest;
     @Mock
@@ -39,8 +40,6 @@ class LoggingInterceptorTest {
     private ClientHttpResponse clientHttpResponse;
 
     private LoggingInterceptor loggingInterceptor = new LoggingInterceptor();
-
-    private static byte[] BODY = new byte[20];
 
     @SneakyThrows
     @BeforeEach

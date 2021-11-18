@@ -23,7 +23,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PassengerClientTest {
 
-
+    private static final String URL = "http://localhost:8080/api/passengers";
+    private static final PassengerDto PASSENGER = PassengerDto.builder()
+            .firstName("Wolfgang")
+            .lastName("Mozart")
+            .email("wolfgang.mozart@gmail.com")
+            .country("Austria")
+            .telephone("123123123")
+            .build();
     @Mock
     private ResponseEntity<List<PassengerDto>> responseEntityList;
     @Mock
@@ -33,23 +40,14 @@ class PassengerClientTest {
     @InjectMocks
     private PassengerClient passengerClient;
 
-    private static final PassengerDto PASSENGER = PassengerDto.builder()
-            .firstName("Wolfgang")
-            .lastName("Mozart")
-            .email("wolfgang.mozart@gmail.com")
-            .country("Austria")
-            .telephone("123123123")
-            .build();
-    
-    private static final String URL = "http://localhost:8080/api/passengers";
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(passengerClient, "apiPassengersUrl", URL);
     }
-    
+
     @Test
     void testGetPassengers() {
-        when(restTemplate.exchange(eq(URL), eq(HttpMethod.GET),nullable(HttpEntity.class),
+        when(restTemplate.exchange(eq(URL), eq(HttpMethod.GET), nullable(HttpEntity.class),
                 any(ParameterizedTypeReference.class)))
                 .thenReturn(responseEntityList);
         when(responseEntityList.getBody()).thenReturn(List.of(PASSENGER));
@@ -84,7 +82,7 @@ class PassengerClientTest {
     @Test
     void testEditPassenger() {
         when(restTemplate.exchange(
-                eq(URL+"/"+1),
+                eq(URL + "/" + 1),
                 eq(HttpMethod.PUT),
                 any(HttpEntity.class),
                 eq(PassengerDto.class)))

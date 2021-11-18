@@ -26,13 +26,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AccessTokenSupplierTest {
 
-    @Mock
-    private AuthenticationClient authenticationClient;
-    @InjectMocks
-    private AccessTokenSupplier accessTokenSupplier;
-    @Mock
-    private StopWatch stopWatch;
-
     private static final Token TOKEN1 = Token.builder()
             .accessToken("access1234")
             .refreshToken("refresh1234")
@@ -41,6 +34,12 @@ class AccessTokenSupplierTest {
             .accessToken("access4321")
             .refreshToken("refresh4321")
             .build();
+    @Mock
+    private AuthenticationClient authenticationClient;
+    @InjectMocks
+    private AccessTokenSupplier accessTokenSupplier;
+    @Mock
+    private StopWatch stopWatch;
 
     @BeforeEach
     void setUp() {
