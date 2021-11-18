@@ -31,6 +31,8 @@ public class BeanConfiguration {
     public RestTemplate restTemplate(List<ClientHttpRequestInterceptor> interceptors) {
         return builder
                 .additionalInterceptors(interceptors)
+                .defaultHeader("Accept", "application/json")
+                .defaultHeader("Content-Type", "application/json")
                 .build();
     }
 }

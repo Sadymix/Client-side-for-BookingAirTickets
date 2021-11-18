@@ -1,13 +1,10 @@
 package com.pgs.client.service;
 
-import com.pgs.client.component.Client;
 import com.pgs.client.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,23 +20,17 @@ public class UserClient {
     private String apiUsersUrl;
 
     public UserDto getSingleUser(Long id) {
-        HttpHeaders headers = getHeaders();
-        var request = new HttpEntity<>(headers);
-        return restTemplate.exchange(
+        return restTemplate.getForObject(
                 apiUsersUrl + "/" + id,
-                HttpMethod.GET,
-                request,
-                UserDto.class).getBody();
+                UserDto.class);
     }
 
     public UserDto addUser(UserDto userDto) {
-        HttpHeaders headers = getHeaders();
-        var request = new HttpEntity<>(userDto, headers);
-        return restTemplate.exchange(
+        var request = new HttpEntity<>(userDto);
+        return restTemplate.postForObject(
                 apiUsersUrl,
-                HttpMethod.POST,
                 request,
-                UserDto.class).getBody();
+                UserDto.class);
     }
 
     public UserDto activateUser(Long id) {
@@ -51,8 +42,7 @@ public class UserClient {
     }
 
     public UserDto setUserRoles(Long id, List<String> roleList) {
-        HttpHeaders headers = getHeaders();
-        var request = new HttpEntity<>(roleList, headers);
+        var request = new HttpEntity<>(roleList);
         return restTemplate.exchange(
                 apiUsersUrl + "/" + id + "/setRoles",
                 HttpMethod.PUT,
@@ -60,21 +50,11 @@ public class UserClient {
                 UserDto.class).getBody();
     }
 
-    private HttpHeaders getHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(Client.TOKEN);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        return headers;
-    }
-
     private UserDto setUserEnabled(String url) {
-        HttpHeaders headers = getHeaders();
-        var request = new HttpEntity<>(headers);
         return restTemplate.exchange(
                 url,
                 HttpMethod.PUT,
-                request,
+                null,
                 UserDto.class).getBody();
     }
 }

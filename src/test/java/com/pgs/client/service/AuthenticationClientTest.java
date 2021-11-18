@@ -23,15 +23,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AuthenticationClientTest {
 
-    @Mock
-    private RestTemplate authRestTemplate;
-    @InjectMocks
-    private AuthenticationClient authenticationClient;
-
     private static final String USERNAME = "user";
     private static final String PASSWORD = "user";
     private static final String TOKEN_URL = "http://localhost:8080/oauth/token";
-
     private static final Token TOKEN = Token.builder()
             .accessToken("asd")
             .tokenType("dsa")
@@ -39,6 +33,10 @@ class AuthenticationClientTest {
             .expiresIn(60)
             .scope("read")
             .build();
+    @Mock
+    private RestTemplate authRestTemplate;
+    @InjectMocks
+    private AuthenticationClient authenticationClient;
 
     @BeforeEach
     void testGetTokenSetUp() {

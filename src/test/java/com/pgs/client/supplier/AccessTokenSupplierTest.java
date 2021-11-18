@@ -14,24 +14,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AccessTokenSupplierTest {
-
-    @Mock
-    private AuthenticationClient authenticationClient;
-    @InjectMocks
-    private AccessTokenSupplier accessTokenSupplier;
-    @Mock
-    private StopWatch stopWatch;
 
     private static final Token TOKEN1 = Token.builder()
             .accessToken("access1234")
@@ -41,6 +34,12 @@ class AccessTokenSupplierTest {
             .accessToken("access4321")
             .refreshToken("refresh4321")
             .build();
+    @Mock
+    private AuthenticationClient authenticationClient;
+    @InjectMocks
+    private AccessTokenSupplier accessTokenSupplier;
+    @Mock
+    private StopWatch stopWatch;
 
     @BeforeEach
     void setUp() {
@@ -75,7 +74,6 @@ class AccessTokenSupplierTest {
     void testSupplyToken10Threads() {
         int numberOfThreads = 10;
         ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
-        CompletableFuture<String> future = null;
         when(authenticationClient.getToken())
                 .thenReturn(TOKEN1);
         for (int i = 0; i < numberOfThreads; i++) {
